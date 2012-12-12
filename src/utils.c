@@ -31,7 +31,9 @@
 #include <sys/time.h>
 
 #include <omp.h>
-#include <mkl.h>
+#if defined MKL
+  #include <mkl.h>
+#endif
 
 #include "GWAS.h"
 #include "wrappers.h"
