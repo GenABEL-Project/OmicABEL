@@ -1,4 +1,5 @@
 CC = gcc
-CFLAGS = -static -static-libgcc -D_FILE_OFFSET_BITS=64 -fopenmp -DMKL
+CFLAGS = -D_FILE_OFFSET_BITS=64 -pthread -fopenmp -DGOTO -DLINUX
 
-LDLIBS = $(MKLROOT)/lib/intel64/librwthmkl.a $(INTELROOT)/compiler/lib/intel64/libiomp5.a
+LDFLAGS =
+LDLIBS = $(HOME)/lapack/lapack_LINUX.a $(HOME)/GotoBLAS2/libgoto2.a -lgfortran -gfortranbegin -lpthread -lrt

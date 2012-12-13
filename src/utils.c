@@ -30,6 +30,10 @@
 
 #include <sys/time.h>
 
+#if defined OSX
+  #include <sys/sysctl.h>
+#endif
+
 #include <omp.h>
 #if defined MKL
   #include <mkl.h>
@@ -48,10 +52,8 @@ void set_multi_threaded_BLAS( int nths )
     setenv("GOTO_NUM_THREADS", nths_str, 1);
     setenv("OMP_NUM_THREADS", "1", 1);
 #elif defined MKL
-	/*setenv("MKL_NUM_THREADS", nths_str, 1);*/
-	mkl_set_num_threads(nths);
-	/*setenv("OMP_NUM_THREADS", "1", 1);*/
-	omp_set_num_threads(nths); // CHECK - Should this be 1?
+	mkl_set_num_threads(nths); // Set MKL to use nths for multithreaded BLAS
+	omp_set_num_threads(nths); // Set OMP to use nths for the openmp parallel directives
 #else
     setenv("OMP_NUM_THREADS", nths_str, 1);
 #endif
@@ -61,11 +63,8 @@ void set_single_threaded_BLAS( void )
 {
 #if defined GOTO
     setenv("GOTO_NUM_THREADS", "1", 1);
-    /*setenv("OMP_NUM_THREADS",  "1", 1);*/
 #elif defined MKL
-	/*setenv("MKL_NUM_THREADS",  "1", 1);*/
 	mkl_set_num_threads(1);
-	/*setenv("OMP_NUM_THREADS",  "1", 1);*/
 	omp_set_num_threads(1);
 #else
     setenv("OMP_NUM_THREADS",  "1", 1);
@@ -79,6 +78,7 @@ void get_main_memory_size( size_t *totalMem, size_t *availMem )
     size_t size = 0;
     char buff[STR_BUFFER_SIZE], field[STR_BUFFER_SIZE], unit[STR_BUFFER_SIZE];
 
+#if defined LINUX
     fp = fgls_fopen( "/proc/meminfo", "rb" );
     fgets( buff, STR_BUFFER_SIZE, fp );
     while ( found < 2 && !feof(fp) ) // Until 2 pieces of info found: Total Mem and Available Mem
@@ -103,6 +103,25 @@ void get_main_memory_size( size_t *totalMem, size_t *availMem )
         fgets( buff, STR_BUFFER_SIZE, fp );
     }
     fclose( fp );
+#elif defined OSX
+    int mib[2];
+    u_int namelen;
+    size_t len;
+
+    mib[0] = CTL_HW;
+    mib[1] = HW_MEMSIZE;
+    namelen = 2;
+    len = sizeof(*totalMem);
+    sysctl(mib, namelen, totalMem, &len, NULL, 0);
+
+    mib[0] = CTL_HW;
+    mib[1] = HW_USERMEM;
+    namelen = 2;
+    len = sizeof(*availMem);
+    sysctl(mib, namelen, availMem, &len, NULL, 0);
+#else
+   // Something
+#endif
 }
 
 void load_dimensions( FGLS_config_t *cf, char *dir )
