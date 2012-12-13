@@ -356,9 +356,6 @@ void ooc_loops( eigen_loops_t *loops_t)
 								  dpotrf_(LOWER, &int_p, oneV, &int_p, &info);
 								  if (info != 0)
 								  {
-									  char err[STR_BUFFER_SIZE];
-									  snprintf(err, STR_BUFFER_SIZE, "dpotrf failed (info: %d)", info);
-									  error_msg(err, 1);
 										for ( k = 0; k < (p+ p*(p+1)/2); k++ )
 											Bij[k] = 0.0/0.0; //nan("char-sequence");
 										continue;
