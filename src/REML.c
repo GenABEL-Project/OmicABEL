@@ -81,7 +81,7 @@ void estimates_chol( FGLS_config_t *cf )
 		cf->sigma2[j] = data.sigma;
 		cf->res_sigma2[j] = data.res_sigma;
 		for ( k = 0; k < cf->wXL; k++ )
-			cf->beta_ests[3*j+k] = data.beta[k];
+			cf->beta_ests[cf->wXL*j+k] = data.beta[k];
 	}
 #if DEBUG
 	// Store data - For testing purposes
@@ -311,7 +311,7 @@ void estimates_eig( FGLS_config_t *cf )
 		cf->sigma2[j] = data.sigma;
 		cf->res_sigma2[j] = data.res_sigma;
 		for ( k = 0; k < cf->wXL; k++ )
-			cf->beta_ests[3*j+k] = data.beta[k];
+			cf->beta_ests[cf->wXL*j+k] = data.beta[k];
 	}
 
 #if DEBUG
