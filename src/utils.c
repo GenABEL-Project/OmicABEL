@@ -320,23 +320,29 @@ void average( double *data, int n, int ncols, int threshold, const char *obj_typ
 {
 	int i, j;
 	double sum, avg;
-	int nans;
+	int nans, infs;
 
 	for ( j = 0; j < ncols; j++ )
 	{
 		sum = 0.0;
 		nans = 0;
+		infs = 0;
 		for ( i = 0; i < n; i++ )
 		{
 			if ( isnan(data[j*n + i]) )
 				nans++;
+			else if ( isinf(data[j*n + i]) )
+			{
+				fprintf(stderr, "[WARNING] Infinity found in %s %s\n", obj_type, &obj_name[j*namelength]);
+				infs++;
+			}
 			else
 				sum += data[j*n + i];
 		}
-		avg = sum / (n-nans);
+		avg = sum / (n-nans-infs);
 		for ( i = 0; i < n; i++ )
 		{
-			if ( isnan(data[j*n + i]) )
+			if ( isnan(data[j*n + i]) || isinf(data[j*n + i]) )
 				data[j*n + i] = avg;
 		}
 		if ( ((float)nans / n) > (100 - threshold)/(float)100 && verbose )
@@ -349,7 +355,7 @@ void checkNoNans( size_t n, double *buff, const char* err_msg)
 {
 	size_t i;
 	for ( i = 0; i < n; i++ )
-		if ( isnan( buff[i] ) )
+		if ( isnan( buff[i] ) || isinf( buff[i] ) )
 		{
 			fprintf( stderr, err_msg );
 			exit( EXIT_FAILURE );
