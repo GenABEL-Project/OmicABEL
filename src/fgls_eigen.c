@@ -33,7 +33,6 @@
 #include <sys/time.h>
 #include <time.h>
 
-/*#include <pthread.h>*/
 #include <omp.h>
 #include <aio.h>
 
@@ -101,7 +100,7 @@ int fgls_eigen( FGLS_config_t *cf )
     return 0;
 }
 
-void ooc_loops( eigen_loops_t *loops_t) 
+void ooc_loops( eigen_loops_t *loops_t ) 
 {
 	/*eigen_loops_t *loops_t = ( eigen_loops_t* ) in;*/
     FGLS_config_t *cf = loops_t->cf;
@@ -205,32 +204,11 @@ void ooc_loops( eigen_loops_t *loops_t)
         }
 
         /* Winv := sqrt( inv( alpha W - beta I ) ) */
-        // Best order? sqrt - inv
-        //
         // Possibly GER
         for (k = 0; k < y_inc; k++)
-        {
             for (l = 0; l < n; l++)
-			{
-                Winv[k*n + l] = sqrt(1.0 / fabs(loops_t->alpha[k] * cf->W[l] + loops_t->beta[k])); // FABS!
-				if (isnan(Winv[k*n+l]))
-				{
-					fprintf(stderr, "k: %d\n", k);
-					fprintf(stderr, "l: %d\n", l);
-					fprintf(stderr, "Eigenvalue: %.15e\n", cf->W[l]);
-					fprintf(stderr, "h: %.15e\n", cf->h2[jb + k]);
-					fprintf(stderr, "sigma: %.15e\n", cf->res_sigma2[jb + k]);
-					fprintf(stderr, "alpha: %.15e\n", loops_t->alpha[k]);
-					fprintf(stderr, "beta:  %.15e\n", loops_t->beta[k]);
-					fprintf(stderr, "alpha ev: %.15e\n", loops_t->alpha[k] * cf->W[l]);
-					fprintf(stderr, "With sigma: %.15e\n", loops_t->alpha[k] * cf->W[l] + loops_t->beta[k]);
-					fprintf(stderr, "Without: %.15e\n", (loops_t->alpha[k] * cf->W[l] + loops_t->beta[k])/cf->res_sigma2[jb + k]);
-					/*fprintf(stderr, "%.15e\n", 1.0 / (loops_t->alpha[k] * cf->W[l] + loops_t->beta[k]));*/
-				}
-			}
-        }
-		checkNoNans(n, cf->W, "Nans in W\n");
-		checkNoNans(n*y_inc, Winv, "Nans in Winv\n");
+                Winv[k*n + l] = sqrt(1.0 / (loops_t->alpha[k] * cf->W[l] + loops_t->beta[k]));
+		//checkNoNans(n*y_inc, Winv, "Nans in Winv\n");
 
         /* y := sqrt(Winv) * Z' * y */
         for (k = 0; k < y_inc; k++)
@@ -242,7 +220,7 @@ void ooc_loops( eigen_loops_t *loops_t)
           for ( k = 0; k < wXL; k++ )
               for ( l = 0; l < n; l++ )
                   XL_copy[ ll * wXL * n + k * n + l ] *= Winv[ll * n + l];
-		checkNoNans(n*wXL, XL_copy, "Nans in XL\n");
+		//checkNoNans(n*wXL, XL_copy, "Nans in XL\n");
           
         /* B_t := XL' * y */
         for (ll = 0; ll < y_inc; ll++)
@@ -285,7 +263,7 @@ void ooc_loops( eigen_loops_t *loops_t)
             VT_USER_END("WAIT_X");
 #endif
             XR_comp = double_buffering_get_comp_buffer( db_XR );
-			checkNoNans(n*x_inc, XR_comp, "Nans in XR\n");
+			//checkNoNans(n*x_inc, XR_comp, "Nans in XR\n");
 
 			double *Bij;
 			int jt, it, xtile = cf->x_tile, ytile = cf->y_tile;
@@ -325,7 +303,7 @@ void ooc_loops( eigen_loops_t *loops_t)
 									   &ONE, XR_copy, &int_n, &Y_comp[j* n], &iONE, 
 									   &ZERO, &oneB[wXL], &iONE);
 
-								checkNoNans(p, oneB, "Nans in oneB\n");
+								//checkNoNans(p, oneB, "Nans in oneB\n");
 			  
 								  /* Building V */
 								  // Copy V_TL
@@ -342,14 +320,14 @@ void ooc_loops( eigen_loops_t *loops_t)
 										 &ONE, XR_copy, &int_n, 
 										 &ZERO, &oneV[wXL * p + wXL], &int_p);
 
-								checkNoNans(p*p, oneV, "Nans in oneV\n");
+								//checkNoNans(p*p, oneV, "Nans in oneV\n");
 			  
 								  /* B := inv(V) * y 
 									int ii, jj;
 									for (ii = 0; ii < p; ii++)
 									{
 										for (jj = 0; jj < p; jj++)
-											printf("%.16e ", oneV[jj*n + ii]);
+											printf("%.16e ", oneV[jj*p + ii]);
 										printf("\n");
 									}
 									printf("\n");*/
@@ -376,11 +354,7 @@ void ooc_loops( eigen_loops_t *loops_t)
 									for ( k = 0; k < p; k++ )
 										Bij[k] = (float) oneB[k];
 									for ( k = 0; k < p; k++ )
-									{
-										/*if (oneV[k*p+k] < 0)*/
-										/*printf("%f < 0\n", oneV[k*p+k]);*/
 										Bij[p+k] = (float)sqrt(oneV[k*p+k]);
-									}
 									int idx = 0;
 									for ( k = 0; k < p-1; k++ ) // Cols of V
 										for ( l = k+1; l < p; l++ ) // Rows of V
@@ -389,11 +363,6 @@ void ooc_loops( eigen_loops_t *loops_t)
 											idx++;
 										}
 #if 0
-								  printf("\nh2: %.16e\n",       cf->h2[jb+j]);
-								  printf("s2: %.16e\n"        , cf->sigma2[jb+j]);
-								  printf("res_sigma2: %.16e\n", cf->res_sigma2[jb+j]);
-								  for ( k = 0; k < (p+ p*(p+1)/2); k++)
-									  printf("%.16e\n", Bij[k]);
 								  printf("Chi square: %.6f\n", ( (oneB[p-1] / Bij[p+p-1]) * (oneB[p-1] / Bij[p+p-1]) ) );
 #endif
 							}
@@ -415,9 +384,7 @@ void ooc_loops( eigen_loops_t *loops_t)
       VT_USER_START("WAIT_B");
 #endif
       if ( jb > 0 || ib > 0 )
-      {
-                double_buffering_wait( db_B, IO_BUFF );
-      }
+		double_buffering_wait( db_B, IO_BUFF );
 #if VAMPIR
       VT_USER_END("WAIT_B");
 #endif
@@ -453,13 +420,6 @@ void ooc_loops( eigen_loops_t *loops_t)
       VT_USER_END("WAIT_B");
 #endif
 
-	  /*long long  int flops = t * (3 + 5*n + 3*n*wXL + n*wXL*wXL) + m*n*t*wXR + */
-	  /*m * t * (p*p*p + 2*n*wXR + 2*n*wXL*wXR + n*wXR*wXR);*/
-
-/*	long long  int flops = m * t * (p*p*p + n*wXR + 2*n*wXR + 2*n*wXL*wXR + n*wXR*wXR);
-	printf("\n\nKernel efficiency: %.6f\n", (float)flops / (total/1000.) / (320*1e9));
-	printf("\n\nTotal time: %.6f\n",  total/1000.);
-*/
 	  free(XR_copy_all);
 }
 

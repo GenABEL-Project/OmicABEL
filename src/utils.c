@@ -71,6 +71,16 @@ void set_single_threaded_BLAS( void )
 #endif
 }
 
+double get_epsilon( void )
+{
+	double eps = 1.0;
+
+	while ( (1.0 + eps/2.0) > 1.0 )
+		eps = eps / 2.0;
+
+	return eps;
+}
+
 void get_main_memory_size( size_t *totalMem, size_t *availMem )
 {
     FILE *fp;
@@ -122,40 +132,6 @@ void get_main_memory_size( size_t *totalMem, size_t *availMem )
 #else
    // Something
 #endif
-}
-
-void load_dimensions( FGLS_config_t *cf, char *dir )
-{
-    FILE *fp;
-    char config_file[STR_BUFFER_SIZE], buff[STR_BUFFER_SIZE];
-    char dim; int size;
-
-    snprintf( config_file, STR_BUFFER_SIZE, "%s/dims.in", dir );
-    fp = fgls_fopen( config_file, "r" );
-    fgets( buff, STR_BUFFER_SIZE, fp );
-    while ( ! feof( fp ) )
-    {
-        sscanf( buff, "%c:%d", &dim, &size );
-        switch (dim)
-        {
-            case 'n':
-                cf->n = size;
-                break;
-            case 'p':
-                cf->p = size + 2;
-                break;
-            case 'm':
-                cf->m = size;
-                break;
-            case 't':
-                cf->t = size;
-                break;
-            default:
-                fprintf(stderr, "Malformed input file. See doc for the expected format\n" );
-        }
-        fgets( buff, STR_BUFFER_SIZE, fp );
-    }
-    fclose( fp );
 }
 
 void estimate_block_sizes( FGLS_config_t *cf, char var, int estimate_inc )

@@ -261,21 +261,31 @@ double polygenic_REML_logLik_chol_wrapper ( double h, void *data )
 void estimates_eig( FGLS_config_t *cf )
 {
 	estimates_eig_t data;
+	double eps; // machine epsilon
 	int j, k;
-#if DEBUG
-	FILE *f_ests;
-#endif
 	
 	// Dimensions
 	data.n   = cf->n;
 	data.wXL = cf->wXL;
-	// Load data
+	// Load Phi
 	data.Phi = cf->Phi;
 	// Compute eigenvectors and eigenvalues in data.Z and data.W
 	cf->Z = data.Z = fgls_malloc( data.n * data.n * sizeof(double) );
 	cf->W = data.W = fgls_malloc( data.n * sizeof(double) );
-	set_multi_threaded_BLAS(cf->num_threads); // Probably can be refined
+	set_multi_threaded_BLAS(cf->num_threads); // Probably can be refined for the iterations below
 	eigen_mr3(data.n, data.Phi, data.Z, data.W);
+	// Phi should be SPD. We set the negative eigenvalues to 
+	//   "epsilon * max( positive eigvalue )"
+	// Eigenvalues are sorted in ascendent order:
+	//   - min eigenvalue in W[0]
+	//   - max eigenvalue in W[n-1]
+	eps = get_epsilon();
+	j = 0;
+	while ( cf->W[j] < 0.0 && j < cf->n )
+	{
+		cf->W[j] = eps * cf->W[cf->n-1];
+		j++;
+	}
 	// Phi is not used anymore
 	free( cf->Phi ); cf->Phi = NULL;
 	// Load XL
@@ -301,12 +311,11 @@ void estimates_eig( FGLS_config_t *cf )
 		sync_read( data.ZtY, cf->ZtY, cf->n, cf->n * j );
 		data.sigma = variance(data.Y, data.n);
 
-		// [a,b] = [0,0.98], tol = 0.01
+		// range [a,b] = [0,0.99], tolerance = 10^{-8}
 		minimize( 0.0, 0.99, 1e-8, &polygenic_REML_logLik_eig_wrapper, (void*)&data );
 #if 0 //DEBUG
 		printf("h: %.15e - sigma: %.15e - res_sigma: %.15e\n", data.h, data.sigma, data.res_sigma);
 #endif
-
 		cf->h2[j] = data.h;
 		cf->sigma2[j] = data.sigma;
 		cf->res_sigma2[j] = data.res_sigma;
@@ -314,17 +323,10 @@ void estimates_eig( FGLS_config_t *cf )
 			cf->beta_ests[cf->wXL*j+k] = data.beta[k];
 	}
 
-#if DEBUG
-	// Store data - For testing purposes
-/*	f_ests = fgls_fopen( cf->ests_path, "wb" );
-	sync_write( cf->ests, f_ests, 3 * cf->t, 0 );
-	fclose( f_ests );*/
-#endif
 	// Encapsulate (maybe reuse)
 	free( data.Y );
 	free( data.beta );
 	free( data.ZtY );
-	// Free Phi? Not used anymore, plus wrong data (from the eigensolver overwritting it)
 }
 
 double polygenic_REML_logLik_eig (
@@ -336,7 +338,6 @@ double polygenic_REML_logLik_eig (
 )
 {
     double alpha, gamma, // to scale W
-//           *beta,
            *ZtY_upd, *ZtX_upd, *YmXB, *V, *D, det, // temporary
            ZERO = 0.0,
            ONE = 1.0,
@@ -344,138 +345,66 @@ double polygenic_REML_logLik_eig (
 
     int    wXL = widthXL,
            iONE = 1, info,
-           i, j; //, k;
+           i, j;
 
-	/*printf("n: %d\n", n);*/
-	/*printf("widthXL: %d\n", widthXL);*/
-	/*checkNoNans(widthXL*n, X, "X");*/
-	/*checkNoNans(n, Y, "Y");*/
-	/*checkNoNans(n*n, Z, "Z");*/
-	/*checkNoNans(n, W, "W");*/
-	/*checkNoNans(n, ZtY, "ZtY");*/
-	/*checkNoNans(widthXL * n, ZtX, "ZtX");*/
-	/*printf("sigma: %f\n", sigma);*/
-	/*printf("h2: %f\n", h2);*/
-	/*beta    = (double *) fgls_malloc ( wXL * sizeof(double) );*/
     V       = (double *) fgls_malloc ( wXL * wXL * sizeof(double) );
 	ZtY_upd = (double *) fgls_malloc ( n * sizeof(double) );
 	ZtX_upd = (double *) fgls_malloc ( n * wXL * sizeof(double) );
 	D = (double *) fgls_malloc ( n * sizeof(double) );
 	YmXB = (double *) fgls_malloc ( n * sizeof(double) );
 
-	/* W = sqrt( inv ( W ) ) */
+	/* 
+	 * W = sqrt( inv ( W ) ) 
+	 * det(M) = sum ( log( eigvalues(M) ) ) 
+	 */
     alpha = h2; // * sigma2;
     gamma = (1 - h2); // * sigma2;
 	det = 0.0;
-	/*checkNoNans(n, W, "\n[ERROR] W\n");*/
 	for ( i = 0; i < n; i++ )
 	{
 		D[i] = alpha * W[i] + gamma;
-		det += log(fabs(D[i]));
-		D[i] = 1.0 / D[i];
+		det += log( D[i] );
+		D[i] = sqrt( 1.0 / D[i] );
 	}
 
 	/* W * ZtX */
 	/* W * ZtY */
-#if 0
-	/*printf("ZtX: %x\n", ZtX);*/
-	for (i = 0; i < wXL; i++)
-	{
-		for (j = 0; j < wXL; j++)
-			printf("%.16e ", ZtX[j*n + i]);
-		printf("\n");
-	}
-	printf("\n");
-	for (i = 0; i < wXL; i++)
-		printf("%.16e ", D[i]);
-	printf("\n\n");
-#endif
-	/*checkNoNans(n, D, "\n[ERROR] D\n");*/
-	// inv( X' inv(M) X) X' inv(M) y
-	// inv(M) -> inv( h Phi + (1-h) I )
-	// inv(M) -> inv( h Z W Z' + (1-h) I )
-	// inv(M) -> Z inv( h W + (1-h) I ) Z'
-	// inv( X' Z D Z' X) X' Z D Z' y
-	// inv( X' Z D Z' X) X' Z D Z' y
-	// inv(V) y
 	for (i = 0; i < n; i++ )
 	{
 		for (j = 0; j < wXL; j++ )
 			ZtX_upd[j*n + i] = ZtX[j*n + i] * D[i];
-		/*ZtY_upd[i] = ZtY[i] * D[i];*/
-		ZtY_upd[i] = ZtY[i];
+		ZtY_upd[i] = ZtY[i] * D[i];
 	}
 
     /* 5) beta := X' * y */
-	/*checkNoNans(n, ZtY_upd, "\n[ERROR] ZtY_upd\n");*/
     dgemv_(TRANS, &n, &widthXL, &ONE, ZtX_upd, &n, ZtY_upd, &iONE, &ZERO, beta, &iONE);
 
     /* 6) V := X' * X */
-#if 0
-	for (i = 0; i < wXL; i++)
-	{
-		for (j = 0; j < wXL; j++)
-			printf("%.16e ", ZtX_upd[j*n + i]);
-		printf("\n");
-	}
-	printf("\n");
-#endif
-	/*checkNoNans(wXL*n, ZtX_upd, "\n[ERROR] ZtX_upd\n");*/
-    dgemm_(TRANS, NO_TRANS, &wXL, &wXL, &n, &ONE, ZtX, &n, ZtX_upd, &n, &ZERO, V, &wXL);
-	/*dsyrk_(LOWER, TRANS, &wXL, &n, &ONE, ZtX_upd, &n, &ZERO, V, &wXL);*/
+	dsyrk_(LOWER, TRANS, &wXL, &n, &ONE, ZtX_upd, &n, &ZERO, V, &wXL);
 
-#if 0
-	printf("wXL: %d\n", wXL);
-	for (i = 0; i < wXL; i++)
-	{
-		for (j = 0; j < wXL; j++)
-			printf("%.16e ", V[j*wXL + i]);
-		printf("\n");
-	}
-	printf("\n");
-#endif
-	/*checkNoNans(wXL*wXL, V, "V");*/
-	int *ipiv = (int *) fgls_malloc (wXL * sizeof(int));
-	int lwork = wXL * 192; // nb
-	double *work = (double *) fgls_malloc ( lwork * sizeof(double));
-    dsysv_(LOWER, &wXL, &iONE, V, &wXL, ipiv, beta, &wXL, work, &lwork, &info);
-	/*dpotrf_(LOWER, &wXL, V, &wXL, &info);*/
+	/*dposv_(LOWER, &wXL, &iONE, V, &wXL, beta, &wXL, &info);*/
+	dpotrf_(LOWER, &wXL,  V, &wXL, &info);
     if (info != 0)
     {
         fprintf(stderr, __FILE__ ": [ERROR] inv(V) y failed - info: %d\n", info);
         exit(-1);
     }
     /* beta := inv( V ) beta */
-	/*dtrsv_(LOWER, NO_TRANS, NON_UNIT, &wXL, V, &wXL, beta, &iONE);*/
-	/*dtrsv_(LOWER,    TRANS, NON_UNIT, &wXL, V, &wXL, beta, &iONE);*/
+	dtrsv_(LOWER, NO_TRANS, NON_UNIT, &wXL, V, &wXL, beta, &iONE);
+	dtrsv_(LOWER,    TRANS, NON_UNIT, &wXL, V, &wXL, beta, &iONE);
 
     // y - X beta
 	memcpy( YmXB, Y, n * sizeof(double) );
-    dgemv_(NO_TRANS, 
+    dgemv_( NO_TRANS, 
             &n, &wXL, 
             &MINUS_ONE, X, &n, beta, &iONE,
-            &ONE, YmXB, &iONE);
+            &ONE, YmXB, &iONE );
 
-/*	memcpy( YmXB, ZtY, n * sizeof(double) );
-    dgemv_(NO_TRANS, 
-            &n, &wXL, 
-            &MINUS_ONE, ZtX, &n, beta, &iONE,
-            &ONE, YmXB, &iONE); // YmXB == y_0
-*/
     // residual sigma and loglik
 	*res_sigma = variance( YmXB, n );
-
 	// loglik = a + b
 	//  a -> log(det(M))
-	//  b -> qt' inv(M) qt
-	//  qt = YmXB
-
-	// Z' * YmXB
-	// 
-	
-	//  qt = YmXB
-	//  b -> qt' 1/sigma Z D Z' qt
-	//  b -> 1/sigma (ZtY' D ZtY)
+	//  b -> YmXB' inv(M) YmXB
     dgemv_(TRANS, 
             &n, &n, 
             &ONE, Z, &n, YmXB, &iONE,
@@ -483,24 +412,19 @@ double polygenic_REML_logLik_eig (
 	// YmXB' * inv( M ) * YmXB
 	*loglik = 0.0;
 	for (i = 0; i < n; i++ )
-	//	*loglik += YmXB[i] * D[i] * YmXB[i];
-		*loglik += ZtY_upd[i] * D[i] * ZtY_upd[i];
-	/**loglik += ZtY_upd[i] * D[i] * D[i] * ZtY_upd[i];*/
-	/**res_sigma = (*loglik) / (n - wXL);*/
+		*loglik += ZtY_upd[i] * D[i] * D[i] * ZtY_upd[i];
 	*loglik = (*loglik) / (*res_sigma); // <- b
-    *loglik = (*loglik) + det + n * log(*res_sigma);
+	// a + b -> det + loglik above
+	//   det incomplete, we must take into account the sigma scaling M -> "+ n * log(*res_sigma)"
+    *loglik = det + n * log(*res_sigma) + (*loglik) ;
 
     // Clean up
-	/*free( beta );*/
 	free( V );
 	free( ZtY_upd );
 	free( ZtX_upd );
 	free( YmXB );
 	free( D );
 
-	free( ipiv );
-	free( work );
-	
 	return *loglik;
 }
 
@@ -561,21 +485,16 @@ void eigen_mr3(int n, double *Phi, double *Z, double *W)
         exit(-1);
     }
 
+#if 0
 	int i;
 	int negs = 0;
 	for (i = 0; i < n; i++)
 	{
 		if (W[i] < 0)
 			negs++;
-		/*else*/
-		/*break;*/
-		if (i > 0 && W[i-1] > W[i])
-			printf("Not sorted!!!!!!!!!!!!!\n");
 	}
 	/*printf("# of negative eigenvalues: %d\n", negs);*/
-	/*printf("First eigenvalue: %.15e\n", W[0]);*/
-	/*printf("Lowest eigen values [-1]: %.15e\n", W[n-1]);*/
-	/*printf("Lowest eigen values [-2]: %.15e\n", W[n-2]);*/
+#endif
 
 	free( work );
 	free( iwork );

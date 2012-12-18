@@ -34,8 +34,11 @@
 void set_multi_threaded_BLAS( int nths );
 void set_single_threaded_BLAS( void );
 
+// Compute an approximation of the machine epsilon
+// in double precision (within a factor of two)
+double get_epsilon( void );
+
 // Startup
-void load_dimensions( FGLS_config_t *cf, char *dir );
 void get_main_memory_size( size_t *totalMem, size_t *availMem );
 void estimate_block_sizes( FGLS_config_t *cf, char var, int estimate_inc );
 
