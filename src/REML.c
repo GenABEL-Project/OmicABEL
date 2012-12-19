@@ -42,219 +42,6 @@
 static void eigen_mr3(int n, double *Phi, double *Z, double *W);
 static void premultiplyXL( int n, int wXL, double *Z, double *XL, double *ZtXL );
 
-
-void estimates_chol( FGLS_config_t *cf )
-{
-	estimates_chol_t data;
-	int j, k;
-#if DEBUG
-	FILE *f_ests;
-#endif
-	
-	// Dimensions
-	data.n   = cf->n;
-	data.wXL = cf->wXL;
-	// Load data
-	data.Phi = cf->Phi;
-	data.X = cf->XL;
-
-	set_multi_threaded_BLAS(cf->num_threads);
-	data.Y = fgls_malloc( data.n * sizeof(double) );
-	data.beta = fgls_malloc( cf->wXL * sizeof(double) );
-	for ( j = 0; j < cf->t; j++ )
-	{
-		// Should Y_fp
-		sync_read( data.Y, cf->Y, cf->n, cf->n * j );
-		// Sanity
-		/*checkNoNans(cf->n, data.Y, "Y");*/
-		average( data.Y, cf->n, 1, cf->threshold, "TRAIT", &cf->Y_fvi->fvi_data[(cf->n+j)*NAMELENGTH], NAMELENGTH, 1 );
-		/*printf("var(Y): %.15e\n", variance(data.Y, cf->n));*/
-
-		data.sigma = variance(data.Y, data.n);
-
-		// [a,b] = [0,0.98], tol = 0.01
-		minimize( 0.0, 0.99, 1e-8, &polygenic_REML_logLik_chol_wrapper, (void*)&data );
-#if 0 //DEBUG
-		printf("h: %.15e - sigma: %.15e - res_sigma: %.15e\n", data.h, data.sigma, data.res_sigma);
-#endif
-		cf->h2[j] = data.h;
-		cf->sigma2[j] = data.sigma;
-		cf->res_sigma2[j] = data.res_sigma;
-		for ( k = 0; k < cf->wXL; k++ )
-			cf->beta_ests[cf->wXL*j+k] = data.beta[k];
-	}
-#if DEBUG
-	// Store data - For testing purposes
-/*	f_ests = fgls_fopen( cf->ests_path, "wb" );
-	sync_write( cf->ests, f_ests, 3 * cf->t, 0 );
-	fclose( f_ests );*/
-#endif
-	free( data.Y );
-	free( data.beta );
-}
-
-double polygenic_REML_logLik_chol (
-        int n, int widthXL,
-        double *Phi, double *X, double *Y, 
-        double sigma2, double h2,
-        double *loglik, double *res_sigma, double *beta
-)
-{
-    double //*beta, //
-		   *initX, *initY, // Copy of the initial X and Y
-           alpha, gamma, // to scale Phi
-           *K, // readibility
-           *V, det, // temporary
-           ZERO = 0.0, // BLAS / LAPACK
-           ONE = 1.0,
-           MINUS_ONE = -1.0;
-
-    int    wXL = widthXL,
-           info,
-           nn = n*n,
-           iONE = 1,
-           i; //, j, k;
-
-	/*beta  = (double *) fgls_malloc ( wXL * sizeof(double) );*/
-    initX = (double *) fgls_malloc ( n * wXL * sizeof(double) );
-    initY = (double *) fgls_malloc ( n * sizeof(double) );
-    V     = (double *) fgls_malloc ( wXL * wXL * sizeof(double) );
-
-    memcpy( initX, X, n * wXL * sizeof(double) );
-    memcpy( initY, Y, n * sizeof(double) );
-
-    /* 1) K := h^2 Phi - (1-h^2) I */
-    K = Phi;
-	alpha = h2; // * sigma2;
-	gamma = (1 - h2); // * sigma2;
-    dscal_(&nn, &alpha, K, &iONE);
-    for ( i = 0; i < n; i++ )
-        K[i*n + i] = K[i*n + i] + gamma;
-
-    /* 2) L * L' = K */
-	int *ipiv = (int *) fgls_malloc (n * sizeof(int));
-	int lwork = n * 192; // nb
-	double *work = (double *) fgls_malloc ( lwork * sizeof(double));
-    dsysv_(LOWER, &n, &widthXL, K, &n, ipiv, X, &n, work, &lwork, &info);
-	/*dpotrf_(LOWER, &n, K, &n, &info);*/
-    if (info != 0)
-    {
-        fprintf(stderr, __FILE__ ": dsysv_ inv(M)*X - The matrix is singular(%d)\n", info);
-        exit(-1);
-    }
-
-    /* 3) X := inv(L) X */
-	/*dtrsm_(LEFT, LOWER, NO_TRANS, NON_UNIT, &n, &wXL, &ONE, K, &n, X, &n);*/
-
-    /* 4) y := inv(L) y */
-	/*dtrsv_(LOWER, NO_TRANS, NON_UNIT, &n, K, &n, Y, &iONE);*/
-	/*dtrsv_(LOWER, NO_TRANS, NON_UNIT, &n, K, &n, &Y[j * n], &iONE);*/
-
-    /* 5) beta := X' * y */
-    dgemv_(TRANS, &n, &widthXL, &ONE, X, &n, Y, &iONE, &ZERO, beta, &iONE);
-
-    /* 6) V := X' * X */
-	/*dsyrk_(LOWER, TRANS, &wXL, &n, &ONE, X, &n, &ZERO, V, &wXL);*/
-    dgemm_(TRANS, NO_TRANS, &wXL, &wXL, &n, &ONE, initX, &n, X, &n, &ZERO, V, &wXL);
-
-    /* Chol(V) */
-	/*dpotrf_(LOWER, &wXL, V, &wXL, &info);*/
-    dsysv_(LOWER, &wXL, &iONE, V, &wXL, ipiv, beta, &wXL, work, &lwork, &info);
-    if (info != 0)
-    {
-        fprintf(stderr, __FILE__ ": [ERROR] inv(V) y failed - info: %d\n", info);
-        exit(-1);
-    }
-    /* beta := inv( V ) beta */
-	/*dtrsv_(LOWER, NO_TRANS, NON_UNIT, &wXL, V, &wXL, beta, &iONE);*/
-	/*dtrsv_(LOWER,    TRANS, NON_UNIT, &wXL, V, &wXL, beta, &iONE);*/
-
-    // y - X beta
-    dgemv_(NO_TRANS, 
-            &n, &wXL, 
-            &MINUS_ONE, initX, &n, beta, &iONE,
-            &ONE, initY, &iONE);
-    // initY stores now "y - X beta"
-
-    // residual sigma and loglik
-	*res_sigma = variance( initY, n );
-
-    memcpy( Y, initY, n * sizeof(double) );
-	dsytrs_( LOWER, &n, &iONE, K, &n, ipiv, initY, &n, &info );
-    if (info != 0)
-    {
-        fprintf(stderr, __FILE__ ": [ERROR] inv(K) y - info: %d\n", info);
-        exit(-1);
-    }
-	/*dtrsv_(LOWER, NO_TRANS, NON_UNIT, */
-	/*&n, K, &n, initY, &iONE);*/
-    *loglik = ddot_(&n, Y, &iONE, initY, &iONE) / (*res_sigma);
-
-	/*
-	 * In principle, the det is just product of diagonal entries (D)
-	 * D can be 2x2 block diagonal
-	 * Have to check this case and compute accordingly
-	 */
-    det = 0;
-    for ( i = 0; i < n; i++ )
-	{
-		/*det += log(K[i*n + i]);*/
-		if ( ipiv[i] > 0 )
-        	det += log(K[i*n + i]);
-		else if ( ipiv[i] < 0 && i > 0 && ipiv[i-1] == ipiv[i] )
-			det += log( K[(i-1)*n + (i-1)] * K[i*n + i] - 
-					    K[(i-1)*n + i] * K[(i-1)*n + i] );
-	}
-	/*det = det * 2;*/
-	*loglik = det + (*loglik) + n * log(*res_sigma);
-
-    // Clean up
-	/*free(beta);*/
-    free(initX);
-    free(initY);
-    free(V);
-
-	free( ipiv );
-	free( work );
-	
-	return *loglik;
-}
-
-double polygenic_REML_logLik_chol_wrapper ( double h, void *data )
-{
-	estimates_chol_t *chol_t = (estimates_chol_t*)data;
-	size_t n   = chol_t->n, 
-	       wXL = chol_t->wXL;
-	double *Phi, //  = chol_t->Phi,
-		   *Y, //    = chol_t->Y,
-		   *X; //    = chol_t->X;
-	double sigma = chol_t->sigma;
-	double loglik;
-
-	Phi = fgls_malloc( n * n * sizeof(double) );
-	X = fgls_malloc( n * wXL * sizeof(double) );
-	Y = fgls_malloc( n * sizeof(double) );
-	memcpy( Phi, chol_t->Phi, n * n * sizeof(double) );
-	memcpy( X, chol_t->X, n * wXL * sizeof(double) );
-	memcpy( Y, chol_t->Y, n * sizeof(double) );
-
-	polygenic_REML_logLik_chol (
-	        n, wXL,
-	        Phi, X, Y,
-			sigma, h,
-	        &loglik, &chol_t->res_sigma, chol_t->beta
-	);
-	
-	chol_t->h = h;
-
-	free( Phi );
-	free( X );
-	free( Y );
-
-	return loglik;
-}
-
-
 /*
  * Eigendecomposition-based REML
  */
@@ -287,7 +74,9 @@ void estimates_eig( FGLS_config_t *cf )
 		j++;
 	}
 	// Phi is not used anymore
-	free( cf->Phi ); cf->Phi = NULL;
+	// It is now that chol also uses this method to estimate h2 and res_sigma2
+	/*free( cf->Phi ); cf->Phi = NULL;*/
+
 	// Load XL
 	data.X = cf->XL;
 	cf->ZtXL = data.ZtX = fgls_malloc( data.n * data.wXL * sizeof(double) );
@@ -452,11 +241,12 @@ double polygenic_REML_logLik_eig_wrapper ( double h, void *data )
 
 	eig_t->h = h;
 
-/*	printf("Loglik: %.15e\n", loglik);
+#if 0
+	printf("Loglik: %.15e\n", loglik);
 	int i;
 	for ( i = 0; i < wXL; i++ )
 		printf("Beta[%d]: %.15e\n", i, eig_t->beta[i]);
-*/
+#endif
 	return loglik;
 }
 
@@ -484,17 +274,6 @@ void eigen_mr3(int n, double *Phi, double *Z, double *W)
         fprintf(stderr, "Error factoring Phi\n");
         exit(-1);
     }
-
-#if 0
-	int i;
-	int negs = 0;
-	for (i = 0; i < n; i++)
-	{
-		if (W[i] < 0)
-			negs++;
-	}
-	/*printf("# of negative eigenvalues: %d\n", negs);*/
-#endif
 
 	free( work );
 	free( iwork );

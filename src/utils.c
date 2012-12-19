@@ -238,7 +238,36 @@ void estimate_block_sizes( FGLS_config_t *cf, char var, int estimate_inc )
         avail_mem = avail_mem - 100 * cf->n; // Extra little vars
 
 		y_b = 1, x_b = 1024 * cf->num_threads;
-		ooc_b = 0;
+		/*ooc_b = 0;*/
+		// Estimate the block size for the ooc gemms
+		ooc_b = 1024 * nths; // 1024 columns per thread
+		avail_mem = avail_mem / 2; // double buffering for ooc
+		converged = 0;
+		while ( !converged )
+		{
+			/*printf("ooc_b: %d\n", ooc_b);*/
+			if ( ooc_b * cf->n < avail_mem ) // 2 buffers, n columns (Z' Y or Z' XR)
+			{
+				cf->ooc_b = ooc_b; // * cf->num_threads;
+				converged = 1;
+			}
+			else if ( ooc_b == 1 )
+			{
+				fprintf( stderr, "[ERROR] Not enought memory (ooc_b). Please try a system with larger memory.\n" );
+				/*fprintf( stderr, "        For testing purposes, please reduce the value of (sample size).\n" );*/
+				exit(EXIT_FAILURE);
+			}
+			else
+			{
+				ooc_b = ooc_b / 2;
+				if ( ooc_b < 512 )
+				{
+					fprintf( stderr, "[WARNING] ooc_b below 512, this might affect performance.\n" );
+					fprintf( stderr, "          We suggest to run this test in a system with a larger amount of memory.\n" );
+					/*fprintf( stderr, "          For testing purposes, if you observe delays, try reducing n (sample size).\n" );*/
+				}
+			}
+		}
 
 		converged = 0;
 		size_t mem_usage;
@@ -260,7 +289,7 @@ void estimate_block_sizes( FGLS_config_t *cf, char var, int estimate_inc )
 				{
 					cf->x_b = MIN( cf->m, x_b );
 					cf->y_b = y_b;
-					cf->ooc_b = 0;
+					cf->ooc_b = ooc_b;
 					converged = 1;
 				}
 				else if ( x_b == 1 )

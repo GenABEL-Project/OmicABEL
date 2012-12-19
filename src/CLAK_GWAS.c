@@ -79,11 +79,11 @@ int main( int argc, char *argv[] )
 		//    var, nths, xtile, ytile, xb, yb, write_output
 	);
 
-	if ( !strcmp( var, "chol" ) )
-	{
-		printf("Chol variant is broken. Please use -var eigen\n");
-		exit(EXIT_FAILURE);
-	}
+	/*if ( !strcmp( var, "chol" ) )*/
+	/*{*/
+	/*printf("Chol variant is broken. Please use -var eigen\n");*/
+	/*exit(EXIT_FAILURE);*/
+	/*}*/
 	
 	printf("\n**************************************************************************\n");
 	printf("*** This is an alpha version under development. Use it at your own risk!!!\n");
@@ -116,7 +116,8 @@ int main( int argc, char *argv[] )
 		printf( "Estimating GWAS parameters: heritability and variance... " );
 		fflush( stdout );
 		gettimeofday(&start, NULL);
-		estimates_chol( &cf ); // Computation
+		/*estimates_chol( &cf ); // Computation*/
+		estimates_eig( &cf ); // Computation
     	gettimeofday(&end, NULL);
 		printf( "Done ( took %.3f secs )\n", get_diff_ms(&start, &end)/1000. );
 		fflush( stdout );

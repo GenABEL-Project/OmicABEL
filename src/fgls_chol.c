@@ -51,6 +51,11 @@
     #include "vt_user.h"
 #endif
 
+/*
+ * Builds Phi as an SPD matrix, after the eigenvalues were fixed 
+ * during the REML estimation
+ */
+void build_SPD_Phi( int n, double *eigVecs, double *eigVals, double *Phi );
 
 /*
  * Cholesky-based solution of the 
@@ -72,7 +77,6 @@ int fgls_chol( FGLS_config_t cf )
     double *M;
 	double *ests;
     double *h2;
-    double *sigma2;
 	double *res_sigma;
     double alpha;
     double beta;
@@ -106,17 +110,17 @@ int fgls_chol( FGLS_config_t cf )
     if ( cf.y_b != 1 )
 	{
         fprintf(stderr, "\n[Warning] y_b not used (set to 1)\n");
-		/*cf.y_b = 1;*/
+		cf.y_b = 1;
 	}
 
     /* Memory allocation */
     // In-core
-    Phi   = cf.Phi;
+	build_SPD_Phi( cf.n, cf.Z, cf.W, cf.Phi );
+	Phi   = cf.Phi;
     M     = ( double * ) fgls_malloc ( (size_t)cf.n * cf.n * sizeof(double) );
     ests  = cf.ests;
 
 	h2 = ests;
-	sigma2 = &ests[cf.t];
 	res_sigma = &ests[2*cf.t];
 
     XL_orig = cf.XL;
@@ -180,8 +184,8 @@ int fgls_chol( FGLS_config_t cf )
 #endif
         /* M := sigma * ( h^2 Phi - (1 - h^2) I ) */
         memcpy( M, Phi, (size_t)n * n * sizeof(double) );
-		alpha = h2[j]; // * res_sigma2[j];
-        beta  = (1 - h2[j]); // * res_sigma2[j];
+		alpha = res_sigma[j] * h2[j];
+        beta  = res_sigma[j] * (1 - h2[j]);
         dscal_(&nn, &alpha, M, &iONE);
         for ( i = 0; i < n; i++ )
             M[i*n + i] = M[i*n + i] + beta;
@@ -282,7 +286,6 @@ int fgls_chol( FGLS_config_t cf )
 #endif
             for (i = 0; i < x_inc; i++)
             {
-				/*printf("p: %d - one record: %d\n", p, size_one_b_record);*/
 				id = omp_get_thread_num();
 				oneB = &tmpBs[ id * p ];
 				oneV = &tmpVs[ id * p * p ];
@@ -316,10 +319,7 @@ int fgls_chol( FGLS_config_t cf )
                 dpotrf_(LOWER, &p, oneV, &p, &info);
                 if (info != 0)
                 {
-					/*char err[STR_BUFFER_SIZE];*/
-					/*snprintf(err, STR_BUFFER_SIZE, "dpotrf(V) failed (info: %d) - i: %d", info, i);*/
-					/*error_msg(err, 1);*/
-					for ( k = 0; k < (p+ p*(p+1)/2); k++ )
+					for ( k = 0; k < size_one_b_record; k++ )
 						Bij[k] = 0.0/0.0; //nan("char-sequence");
 					continue;
                 }
@@ -334,16 +334,12 @@ int fgls_chol( FGLS_config_t cf )
                     snprintf(err, STR_BUFFER_SIZE, "dpotri failed (info: %d)", info);
                     error_msg(err, 1);
                 }
-                int p2 = p*p;
-                dscal_(&p2, &res_sigma[j], oneV, &iONE);
 
 				// Copy output
 				for ( k = 0; k < p; k++ )
 					Bij[k] = (float) oneB[k];
                 for ( k = 0; k < p; k++ )
-				{
                     Bij[p+k] = (float)sqrt(oneV[k*p+k]);
-				}
 				int idx = 0;
 				for ( k = 0; k < p-1; k++ ) // Cols of V
 					for ( l = k+1; l < p; l++ ) // Rows of V
@@ -352,11 +348,6 @@ int fgls_chol( FGLS_config_t cf )
 						idx++;
 					}
 #if 0
-			  printf("\nh2: %.16e\n",       cf.h2[j]);
-			  printf("s2: %.16e\n"        , cf.sigma2[j]);
-			  printf("res_sigma2: %.16e\n", cf.res_sigma2[j]);
-			  for ( k = 0; k < (p+ p*(p+1)/2); k++)
-				  printf("%.16e\n", Bij[k]);
 			  printf("Chi square: %.6f\n", ( (oneB[p-1] / Bij[p+p-1]) * (oneB[p-1] / Bij[p+p-1]) ) );
 #endif
             }
@@ -369,9 +360,7 @@ int fgls_chol( FGLS_config_t cf )
 #endif
             /* Wait until the previous blocks of B's and V's are written */
             if ( iter > 0)
-            {
                 double_buffering_wait( &db_B, IO_BUFF );
-            }
 #if VAMPIR
             VT_USER_END("WAIT_BV");
 #endif
@@ -418,4 +407,34 @@ int fgls_chol( FGLS_config_t cf )
 	double_buffering_destroy( &db_B  );
 
     return 0;
+}
+
+/*
+ * Builds Phi as an SPD matrix, after the eigenvalues were fixed 
+ * during the REML estimation
+ *
+ * Z = eigVecs
+ * W = eigVals
+ * Phi = Z W Z^T
+ */
+void build_SPD_Phi( int n, double *eigVecs, double *eigVals, double *Phi )
+{
+	double ONE = 1.0,
+		   ZERO = 0.0,
+		   *tmp;
+	int i, j;
+
+	tmp = fgls_malloc( n * n * sizeof(double) );
+
+	// tmp = Z * W
+	for ( j = 0; j < n; j++ )
+		for ( i = 0; i < n; i++ )
+			tmp[ j*n + i ] = eigVecs[ j*n + i ] * eigVals[j];
+	// Phi = tmp * Z^T
+	dgemm_( NO_TRANS, TRANS,
+			&n, &n, &n,
+			&ONE, tmp, &n, eigVecs, &n,
+			&ZERO, Phi, &n );
+
+	free( tmp );
 }

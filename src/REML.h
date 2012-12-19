@@ -28,38 +28,6 @@
 #include "GWAS.h"
 
 /*
- * REML based on the Cholesky approach
- *
- * Data structure, Cholesky REML, and wrappers
- */
-typedef struct
-{
-	// Problem dimensions
-	size_t n;
-	size_t wXL;
-
-	// Data to fit
-	double *Phi;
-	double *X;
-	double *Y;
-	double sigma;
-
-	// computed estimates
-	double h;
-	double res_sigma;
-	double *beta;
-} estimates_chol_t;
-
-void estimates_chol( FGLS_config_t *cf );
-double polygenic_REML_logLik_chol_wrapper ( double h, void *data );
-double polygenic_REML_logLik_chol(
-        int n, int widthXL,
-        double *Phi, double *X, double *Y, 
-        double sigma2, double h2,
-        double *loglik, double *res_sigma, double *beta
-);
-
-/*
  * REML based on the Eigendecomposition approach
  *
  * Data structure, Eigen REML, and wrapper
