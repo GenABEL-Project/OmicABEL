@@ -1,0 +1,5 @@
+ver 0.001
+	improved parsing of command line:
+		search for parameter's name only after separator
+		delete parameter's name and value from command line in case of finding it
+		

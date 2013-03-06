@@ -2,7 +2,7 @@
  * Parameters.cpp
  *
  *  Created on: 28.02.2013
- *      Author: lima
+ *      Author: Sodbo
  */
 #include "Parameters.h"
 #include <stdlib.h>
@@ -55,8 +55,8 @@ ostream &operator <<(ostream &os, Parameters par) {
 Parameter::Parameter(string cmdline, string paramname) {
 
 	name = paramname;
-	int parpos = cmdline.find(name); //	position of substring with param's name
-	if (parpos != string::npos) { //	check  [FOUND OR NOT]
+	int parpos = cmdline.find("--"+name)+2; //	position of substring with param's name
+	if (parpos != string::npos+2) { //	check  [FOUND OR NOT]
 		string val = "";
 		unsigned int iter = parpos + name.size() + 1; //	iterator, which run from "=" to sep
 		unsigned int seppos = cmdline.find(sep, parpos); // 	separator position
@@ -64,6 +64,7 @@ Parameter::Parameter(string cmdline, string paramname) {
 			val += cmdline.at(iter); // build value of parameter
 			iter++;
 		}
+
 		use = true;
 		if (val.size() != 0) {
 			value = val;
@@ -87,7 +88,9 @@ Parameter::Parameter(string cmdline, string paramname) {
 						for(int i=atoi(start.c_str())-1;i<atoi(end.c_str());i++){
 							valueset.insert(i);
 						}
-					}else valueset.insert(atoi(str_tmp.c_str())-1);
+					}else if(atoi(str_tmp.c_str())!=0)
+						valueset.insert(atoi(str_tmp.c_str())-1);
+
 					str_tmp="";
 				}
 			}
@@ -99,19 +102,40 @@ Parameter::Parameter(string cmdline, string paramname) {
 	}
 }
 
+string Parameter::delfromcmdline(string cmdline){
+	if(use){
+		int val=value.size();
+		if(value=="None"||value=="all")
+			val=-1;
+		cmdline.replace(cmdline.find(name)-2,name.size()+val+3,"");
+	}
+	return cmdline;
+}
+
 //	Constructor, which gets info about all parameters from cmdline
 Parameters::Parameters(int argc,char* argv[]) {
-	string cmdline=get_cmd_line(argc,argv);
+	static string cmdline=get_cmd_line(argc,argv);
 	unsigned int seppos = cmdline.find(sep); // 	first separator's position
 	string filename = cmdline.substr(0, seppos);
+	cmdline.erase(0,seppos);//Erase file name
 	iout_fname = filename + ".iout";
 	out_fname = filename + ".out";
+	info = Parameter(cmdline, "info");
+	cmdline=info.delfromcmdline(cmdline);
 	datadims = Parameter(cmdline, "datadims");
+	cmdline=datadims.delfromcmdline(cmdline);
 	snpnames = Parameter(cmdline, "snpnames");
+	cmdline=snpnames.delfromcmdline(cmdline);
 	traitnames = Parameter(cmdline, "traitnames");
+	cmdline=traitnames.delfromcmdline(cmdline);
 	traits = Parameter(cmdline, "traits");
+	cmdline=traits.delfromcmdline(cmdline);
 	snps = Parameter(cmdline, "snps");
+	cmdline=snps.delfromcmdline(cmdline);
 	heritabilities = Parameter(cmdline, "heritabilities");
+	cmdline=heritabilities.delfromcmdline(cmdline);
 	chi = Parameter(cmdline, "chi");
+	cmdline=	chi.delfromcmdline(cmdline);
 	dataslim= Parameter(cmdline, "dataslim");
+	cmdline=	dataslim.delfromcmdline(cmdline);
 }

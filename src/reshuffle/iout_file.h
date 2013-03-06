@@ -2,7 +2,7 @@
  * iout_file.h
  *
  *  Created on: 28.02.2013
- *      Author: lima
+ *      Author: Sodbo
  */
 
 #ifndef IOUT_FILE_H_

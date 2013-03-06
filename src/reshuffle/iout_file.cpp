@@ -2,7 +2,7 @@
  * iout_file.cpp
  *
  *  Created on: 28.02.2013
- *      Author: lima
+ *      Author: Sodbo
  */
 #include "iout_file.h"
 

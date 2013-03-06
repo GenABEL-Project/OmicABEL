@@ -2,7 +2,7 @@
  * Parameters.h
  *
  *  Created on: 28.02.2013
- *      Author: lima
+ *      Author: Sodbo
  */
 
 #ifndef PARAMETERS_H_
@@ -22,13 +22,15 @@ public:
 	Parameter(string,string); 	//constructor
 	Parameter();		//default constructor
 	set<int> valueset;
+	string delfromcmdline(string);
 };
 
 ostream &operator <<(ostream &, Parameter);
 
 class Parameters {
 public:
-	string iout_fname;
+	Parameter info; // Write info about progeamm's run
+	string iout_fname; //iout_file_name
 	string out_fname;
 	Parameter datadims;
 	Parameter snpnames;
@@ -39,7 +41,7 @@ public:
 	Parameter chi;
 	Parameter dataslim;
 	Parameters(int, char*[]);		//	Constructor from cmdline
-	string get_cmd_line(int,char*[]);
+	static string get_cmd_line(int,char*[]);
 
 };
 
