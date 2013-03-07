@@ -4,7 +4,7 @@
  *  Created on: 28.02.2013
  *      Author: Sodbo
  */
-#include "Parameters.h"
+#include "parameters.h"
 #include <stdlib.h>
 #include <string>
 using namespace std;
@@ -49,6 +49,9 @@ ostream &operator <<(ostream &os, Parameters par) {
 	os << par.chi;
 	os << par.dataslim;
 	return os;
+}
+
+Parameters::Parameters(){
 }
 
 //Constructor-parser from command line

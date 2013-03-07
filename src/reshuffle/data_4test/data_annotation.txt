@@ -1,0 +1,13 @@
+Annotation of <4test> data
+
+# of traits:5
+# of covariates:2
+# of snps:100
+
+Traits:
+hgta,tga,tca,ldla,hdla
+
+covariates:
+sex,age
+
+SNPs:
