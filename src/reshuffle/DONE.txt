@@ -5,7 +5,7 @@ ver 0.001
 ver 0.002
 	tests for all points in specification
 		one bug with traitsbynames test unfixed
-	all datas written ub one file in root folder
+	all datas written in one file in root folder
 		datadims->datadims.txt
 		trait(snp)names->traits(snp)names.txt
 		traits(snps)->data.txt

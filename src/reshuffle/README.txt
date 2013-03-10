@@ -2,7 +2,7 @@ Reshuffle ver 0.000
 
 Parameters:
 
-For the first it should be file name withiut iout and out extensions:
+For the first it should be file name without iout and out extensions:
 	(--B_eigen_1000) 
 	if your files are B_eigen.iout and B_eigen.out
 
@@ -49,6 +49,10 @@ Just write data with chi
 Dataslim
 	Creating a sub-matrix by Chi2>X (--chi=X--dataslim)
 	output: "slim_data//slim_[trait].txt"
+	
+Test
+	(--test) run all tests
+	output: test.txt
 
 Examples:
 Reshuffle.exe B_1112_NA_clear_RNA_nocovar --traitnames=1-4,1--snpnames=1-10,20-30,46--traits=1--snps=1-100
