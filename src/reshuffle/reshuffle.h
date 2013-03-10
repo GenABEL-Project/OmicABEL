@@ -20,6 +20,7 @@ public:
 	set<int> traits2write;
 	set<int> snps2write;
 	string create_filename(string, string);
+	string create_filename(string);
 	void write_datadims(ofstream&);
 	void write_snpnames(ofstream&);
 	void write_traitnames(ofstream&);

@@ -18,6 +18,7 @@ string Parameters::get_cmd_line(int argc, char* argv[]) {
 		cmd_line += argv[i];
 	}
 	cmd_line += sep; // Need for cmdline parsing
+	cout<<cmd_line<<endl;
 	return cmd_line;
 }
 //Default constructor
@@ -141,4 +142,6 @@ Parameters::Parameters(int argc,char* argv[]) {
 	cmdline=	chi.delfromcmdline(cmdline);
 	dataslim= Parameter(cmdline, "dataslim");
 	cmdline=	dataslim.delfromcmdline(cmdline);
+	test= Parameter(cmdline, "test");
+	cmdline=test.delfromcmdline(cmdline);
 }

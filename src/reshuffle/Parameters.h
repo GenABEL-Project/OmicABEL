@@ -40,6 +40,7 @@ public:
 	Parameter heritabilities;
 	Parameter chi;
 	Parameter dataslim;
+	Parameter test;
 	Parameters();
 	Parameters(int, char*[]);		//	Constructor from cmdline
 	static string get_cmd_line(int,char*[]);

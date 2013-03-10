@@ -8,18 +8,20 @@
 #ifndef TEST_H_
 #define TEST_H_
 #include "parameters.h"
-
+#include "iout_file.h"
+#include "reshuffle.h"
+//#include <dir.h>
 using namespace std;
 
-class parameters_test{
-
+class test{
 public:
-	Parameters Params_1;
-	Parameters Params_2;
-	Parameters Params_3;
-	parameters_test(int);
+	string name;
+	string result;
+	string check;
+	Parameters Params;
+
+	Parameters *Params_test=&Params;
+	test(string,string,string,string);
 	void run();
 };
-
-void run();
 #endif /* TEST_H_ */

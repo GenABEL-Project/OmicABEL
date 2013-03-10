@@ -6,7 +6,7 @@
  */
 
 #include "reshuffle.h"
-#include <dir.h>
+//#include <dir.h>
 #include <ctime>
 #include <math.h>
 #include <iterator>
@@ -27,6 +27,10 @@ Reshuffle::Reshuffle(iout_file &iout,Parameters &Params){
 
 string Reshuffle::create_filename(string prename, string name) {
 	string path = prename + "_"+name+".txt";
+	return path;
+}
+string Reshuffle::create_filename(string name) {
+	string path = name+".txt";
 	return path;
 }
 
@@ -64,12 +68,13 @@ void Reshuffle::write_traitnames(ofstream& txt_traitnames){
 void Reshuffle::write_data(ifstream& out_file){
 	out_file.seekg(0, ios_base::beg);
 	cout << "startwritetxt=" << double(clock()) / CLOCKS_PER_SEC << endl;
+	ofstream txt_trait(create_filename("data").c_str());
 	for (set<int>::iterator trait= (*p_Parameters).traits.valueset.begin();trait!=(*p_Parameters).traits.valueset.end();trait++) {
-		ofstream txt_trait(create_filename("data//trait", (*(*p_iout_file).labels.trait_names)[*trait]).c_str());
+
 		//Set precision of double
 		cout<<(*(*p_iout_file).labels.trait_names)[*trait]<<endl;
 		txt_trait.precision(PRECISION_DOUBLE);
-		txt_trait << "\t";
+		txt_trait<<	(*(*p_iout_file).labels.trait_names)[*trait]<<endl;
 		for (int beta = 0;	beta < (*(*p_iout_file).labels.beta).size(); beta++)
 			txt_trait << (*(*p_iout_file).labels.beta)[beta] << "\t";
 		for (int se = 0;se < (*(*p_iout_file).labels.se).size(); se++)
@@ -98,7 +103,7 @@ void Reshuffle::write_data(ifstream& out_file){
 			txt_trait << endl;
 		}
 		delete buf;
-		txt_trait.close();
+		//txt_trait.close();
 		cout << "endwritetrait " << (*(*p_iout_file).labels.trait_names)[*trait] << " "<< double(clock()) / CLOCKS_PER_SEC << endl;
 	}
 	cout << "finishwritetxt=" << double(clock()) / CLOCKS_PER_SEC << endl;
@@ -109,11 +114,12 @@ void Reshuffle::write_data_chi(ifstream& out_file){
 	double chi = 0;
 	double CheckChi = (*p_Parameters).chi.value == "all" ? -1.0 : atof((*p_Parameters).chi.value.c_str());
 	cout << "startwritetxt=" << double(clock()) / CLOCKS_PER_SEC << endl;
+	ofstream txt_chi(create_filename("chi_data").c_str());
 	for (set<int>::iterator trait= (*p_Parameters).traits.valueset.begin();trait!=(*p_Parameters).traits.valueset.end();trait++) {
-		ofstream txt_chi(create_filename("chi_data//chi", (*(*p_iout_file).labels.trait_names)[*trait]).c_str());
+		//ofstream txt_chi(create_filename("chi_data//chi", (*(*p_iout_file).labels.trait_names)[*trait]).c_str());
 		//Set precision of double
 		txt_chi.precision(PRECISION_DOUBLE);
-		txt_chi << "\t";
+		txt_chi<<	(*(*p_iout_file).labels.trait_names)[*trait]<<endl;
 		for (int beta = 0;	beta < (*(*p_iout_file).labels.beta).size(); beta++)
 			txt_chi << (*(*p_iout_file).labels.beta)[beta] << "\t";
 		for (int se = 0;se < (*(*p_iout_file).labels.se).size(); se++)
@@ -144,7 +150,7 @@ void Reshuffle::write_data_chi(ifstream& out_file){
 			}
 		}
 		delete buf;
-		txt_chi.close();
+		//txt_chi.close();
 		cout << "endwritechitrait " << (*(*p_iout_file).labels.trait_names)[*trait] << " "<< double(clock()) / CLOCKS_PER_SEC << endl;
 	}
 	cout << "finishwritechitxt=" << double(clock()) / CLOCKS_PER_SEC << endl;
@@ -183,11 +189,12 @@ void Reshuffle::write_slim_data(ifstream& out_file){
 		delete buf;
 	}
 	out_file.seekg(0, ios_base::beg);
+	ofstream txt_slim(create_filename("slim_data").c_str());
+
 	for (set<int>::iterator trait= goodtraits.begin();trait!=goodtraits.end();trait++) {
-		ofstream txt_slim(create_filename("slimdata//slim", (*(*p_iout_file).labels.trait_names)[*trait]).c_str());
 		//Set precision of double
 		txt_slim.precision(PRECISION_DOUBLE);
-		txt_slim << "\t";
+		txt_slim<<	(*(*p_iout_file).labels.trait_names)[*trait]<<endl;
 		for (int beta = 0;	beta < (*(*p_iout_file).labels.beta).size(); beta++)
 			txt_slim << (*(*p_iout_file).labels.beta)[beta] << "\t";
 		for (int se = 0;se < (*(*p_iout_file).labels.se).size(); se++)
@@ -216,7 +223,7 @@ void Reshuffle::write_slim_data(ifstream& out_file){
 			txt_slim << chi << endl;
 		}
 		delete buf;
-		txt_slim.close();
+		//txt_slim.close();
 	}
 }
 
@@ -233,7 +240,7 @@ int Reshuffle::est_beta_shift(int counter){
 }
 
 void Reshuffle::write_herest(ifstream& out_file){
-	ofstream txt_est("estimates//estimates.txt");
+	ofstream txt_est("estimates.txt");
 	out_file.seekg(herest_startpos, ios_base::beg);
 	if (p_Parameters->heritabilities.value == "all")
 		for(int i=0;i<(*(p_iout_file->labels.trait_names)).size();i++)
@@ -284,19 +291,19 @@ void Reshuffle::write_herest(ifstream& out_file){
 
 void Reshuffle::run(){
 	if((*p_Parameters).datadims.use){
-		mkdir("datadims");
-		ofstream datadims("datadims//datadims.txt");
+		//mkdir("datadims");
+		ofstream datadims("datadims.txt");
 		write_datadims(datadims);
 	}
 	if((*p_Parameters).snpnames.use){
-		mkdir("snpnames");
-		ofstream snpnames("snpnames//snpnames.txt");
+		//mkdir("snpnames");
+		ofstream snpnames("snpnames.txt");
 		write_snpnames(snpnames);
 	}
 
 	if((*p_Parameters).traitnames.use){
-		mkdir("traitnames");
-		ofstream* traitnames = new ofstream("traitnames//traitnames.txt");
+		//mkdir("traitnames");
+		ofstream* traitnames = new ofstream("traitnames.txt");
 		write_traitnames(*traitnames);
 		delete traitnames;
 	}
@@ -327,24 +334,24 @@ void Reshuffle::run(){
 	}
 
 	if(((*p_Parameters).traits.use||(*p_Parameters).snps.use)&&!(*p_Parameters).chi.use){
-		mkdir("data");
+		//mkdir("data");
 		write_data(out_file);
 	}
 
 	if((*p_Parameters).chi.use&&!(*p_Parameters).dataslim.use){
-		mkdir("chi_data");
+		//mkdir("chi_data");
 		write_data_chi(out_file);
 
 	}
 
 	if((*p_Parameters).dataslim.use){
-		mkdir("slimdata");
+		//mkdir("slimdata");
 		write_slim_data(out_file);
 
 	}
 
 	if((*p_Parameters).heritabilities.use){
-		mkdir("estimates");
+		//mkdir("estimates");
 		write_herest(out_file);
 	}
 }
