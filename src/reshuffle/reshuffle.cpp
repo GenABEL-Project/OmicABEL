@@ -45,10 +45,10 @@ void Reshuffle::write_snpnames(ofstream& txt_snpnames){
 
 	if ((*p_Parameters).snpnames.value == "all"){
 		for (int i=0;i<(*(*p_iout_file).labels.snp_names).size();i++)
-			(*p_Parameters).snpnames.valueset.insert(i);
+			(*p_Parameters).snpnames.numbersset.insert(i);
 		cout<<"SNPNAMES VALUE SET CHANGED TO ALL"<<endl;
 	}
-	for(set<int>::iterator it= (*p_Parameters).snpnames.valueset.begin();it!=(*p_Parameters).snpnames.valueset.end();++it)
+	for(set<int>::iterator it= (*p_Parameters).snpnames.numbersset.begin();it!=(*p_Parameters).snpnames.numbersset.end();++it)
 		txt_snpnames << "SNP #"<<(*it+1)<<"\t"<<(*(*p_iout_file).labels.snp_names)[*it]<<endl;
 	cout<<"END WRITE SNPNAMES"<<endl;
 }
@@ -57,10 +57,10 @@ void Reshuffle::write_traitnames(ofstream& txt_traitnames){
 
 	if ((*p_Parameters).traitnames.value == "all"){
 		for (int i=0;i<(*(*p_iout_file).labels.trait_names).size();i++)
-			(*p_Parameters).traitnames.valueset.insert(i);
+			(*p_Parameters).traitnames.numbersset.insert(i);
 		cout<<"TRAITNAMES VALUE SET CHANGED TO ALL"<<endl;
 	}
-	for(std::set<int>::iterator it= (*p_Parameters).traitnames.valueset.begin();it!=p_Parameters->traitnames.valueset.end();++it)
+	for(std::set<int>::iterator it= (*p_Parameters).traitnames.numbersset.begin();it!=p_Parameters->traitnames.numbersset.end();++it)
 		txt_traitnames<<"TRAIT #"<<(*it+1)<<"\t"<<(*(*p_iout_file).labels.trait_names)[*it]<<endl;
 	cout<<"END WRITE TRAITNAMES"<<endl;
 }
@@ -69,7 +69,7 @@ void Reshuffle::write_data(ifstream& out_file){
 	out_file.seekg(0, ios_base::beg);
 	cout << "startwritetxt=" << double(clock()) / CLOCKS_PER_SEC << endl;
 	ofstream txt_trait(create_filename("data").c_str());
-	for (set<int>::iterator trait= (*p_Parameters).traits.valueset.begin();trait!=(*p_Parameters).traits.valueset.end();trait++) {
+	for (set<int>::iterator trait= (*p_Parameters).traits.numbersset.begin();trait!=(*p_Parameters).traits.numbersset.end();trait++) {
 
 		//Set precision of double
 		cout<<(*(*p_iout_file).labels.trait_names)[*trait]<<endl;
@@ -86,7 +86,7 @@ void Reshuffle::write_data(ifstream& out_file){
 		double* buf = new double[per_trait_per_snp];
 		int oldPos = 0;
 		char s[30];
-		for (set<int>::iterator snp= (*p_Parameters).snps.valueset.begin();snp!=(*p_Parameters).snps.valueset.end();snp++) {
+		for (set<int>::iterator snp= (*p_Parameters).snps.numbersset.begin();snp!=(*p_Parameters).snps.numbersset.end();snp++) {
 			txt_trait << (*(*p_iout_file).labels.snp_names)[*snp] << "\t";
 			int pos = (*p_iout_file).tilecoordinates(*trait, *snp);
 			//cout << oldPos << "-" << pos << endl;
@@ -115,7 +115,7 @@ void Reshuffle::write_data_chi(ifstream& out_file){
 	double CheckChi = (*p_Parameters).chi.value == "all" ? -1.0 : atof((*p_Parameters).chi.value.c_str());
 	cout << "startwritetxt=" << double(clock()) / CLOCKS_PER_SEC << endl;
 	ofstream txt_chi(create_filename("chi_data").c_str());
-	for (set<int>::iterator trait= (*p_Parameters).traits.valueset.begin();trait!=(*p_Parameters).traits.valueset.end();trait++) {
+	for (set<int>::iterator trait= (*p_Parameters).traits.numbersset.begin();trait!=(*p_Parameters).traits.numbersset.end();trait++) {
 		//ofstream txt_chi(create_filename("chi_data//chi", (*(*p_iout_file).labels.trait_names)[*trait]).c_str());
 		//Set precision of double
 		txt_chi.precision(PRECISION_DOUBLE);
@@ -130,7 +130,7 @@ void Reshuffle::write_data_chi(ifstream& out_file){
 		double* buf = new double[per_trait_per_snp];
 		int oldPos = 0;
 		char s[30];
-		for (set<int>::iterator snp= (*p_Parameters).snps.valueset.begin();snp!=(*p_Parameters).snps.valueset.end();snp++) {
+		for (set<int>::iterator snp= (*p_Parameters).snps.numbersset.begin();snp!=(*p_Parameters).snps.numbersset.end();snp++) {
 			int pos = (*p_iout_file).tilecoordinates(*trait, *snp);
 			//cout << oldPos << "-" << pos << endl;
 			if(pos != oldPos)
@@ -167,11 +167,11 @@ void Reshuffle::write_slim_data(ifstream& out_file){
 		exit(1);
 	}
 	double CheckChi = atof((*p_Parameters).chi.value.c_str());
-	for (set<int>::iterator trait= (*p_Parameters).traits.valueset.begin();trait!=(*p_Parameters).traits.valueset.end();trait++) {
+	for (set<int>::iterator trait= (*p_Parameters).traits.numbersset.begin();trait!=(*p_Parameters).traits.numbersset.end();trait++) {
 		double* buf = new double[per_trait_per_snp];
 		int oldPos = 0;
 		char s[30];
-		for (set<int>::iterator snp= (*p_Parameters).snps.valueset.begin();snp!=(*p_Parameters).snps.valueset.end();snp++) {
+		for (set<int>::iterator snp= (*p_Parameters).snps.numbersset.begin();snp!=(*p_Parameters).snps.numbersset.end();snp++) {
 			int pos = (*p_iout_file).tilecoordinates(*trait, *snp);
 			//cout << oldPos << "-" << pos << endl;
 			if(pos != oldPos)
@@ -244,10 +244,10 @@ void Reshuffle::write_herest(ifstream& out_file){
 	out_file.seekg(herest_startpos, ios_base::beg);
 	if (p_Parameters->heritabilities.value == "all")
 		for(int i=0;i<(*(p_iout_file->labels.trait_names)).size();i++)
-			p_Parameters->heritabilities.valueset.insert(i);
+			p_Parameters->heritabilities.numbersset.insert(i);
 	txt_est.precision(PRECISION_DOUBLE);
 	txt_est<<"\t";
-	for (set<int>::iterator trait= p_Parameters->heritabilities.valueset.begin();trait!=p_Parameters->heritabilities.valueset.end();trait++)
+	for (set<int>::iterator trait= p_Parameters->heritabilities.numbersset.begin();trait!=p_Parameters->heritabilities.numbersset.end();trait++)
 		txt_est << (*(p_iout_file->labels.trait_names))[*trait] << "\t";
 	txt_est << endl;
 	list<string> est_names;
@@ -258,7 +258,7 @@ void Reshuffle::write_herest(ifstream& out_file){
 	int counter=0;
 	for (list<string>::iterator name = est_names.begin();name != est_names.end(); ++name) {
 		txt_est << *name << "\t";
-		for (std::set<int>::iterator trait= p_Parameters->heritabilities.valueset.begin();trait!=p_Parameters->heritabilities.valueset.end();++trait) {
+		for (std::set<int>::iterator trait= p_Parameters->heritabilities.numbersset.begin();trait!=p_Parameters->heritabilities.numbersset.end();++trait) {
 			out_file.seekg(*trait*sizeof(double),ios_base::cur);
 			out_file.read((char *) &tmp_number, sizeof(double));
 			txt_est << tmp_number << "\t";
@@ -275,7 +275,7 @@ void Reshuffle::write_herest(ifstream& out_file){
 		if (beta != (*(p_iout_file->labels.beta)).size()) {
 			beta--;
 			txt_est << (*(p_iout_file->labels).beta)[beta] << "\t";
-			for (std::set<int>::iterator trait= p_Parameters->heritabilities.valueset.begin();trait!=p_Parameters->heritabilities.valueset.end();++trait) {
+			for (std::set<int>::iterator trait= p_Parameters->heritabilities.numbersset.begin();trait!=p_Parameters->heritabilities.numbersset.end();++trait) {
 				out_file.seekg(*trait*sizeof(double),ios_base::cur);
 				out_file.read((char *) &tmp_number, sizeof(double));
 				txt_est << tmp_number << "\t";
@@ -316,19 +316,19 @@ void Reshuffle::run(){
 		exit(1);
 	}
 
-	//If any of parameters traits||snps||chi use, this block fill traits.valueset and snps.valueset
+	//If any of parameters traits||snps||chi use, this block fill traits.numbersset and snps.numbersset
 	//(if their values are default all)
 	if((*p_Parameters).traits.use||(*p_Parameters).snps.use||(*p_Parameters).chi.use){
 
 			if((*p_Parameters).traits.value=="all"||(*p_Parameters).traits.value=="None"){
 				for(int i=0;i<(*(*p_iout_file).labels.trait_names).size();i++)
-				(*p_Parameters).traits.valueset.insert(i);
+				(*p_Parameters).traits.numbersset.insert(i);
 			cout<<"TRAITS VALUE SET CHANGED TO ALL"<<endl;
 		}
 
 		if((*p_Parameters).snps.value=="all"||(*p_Parameters).snps.value=="None"){
 			for(int i=0;i<(*(*p_iout_file).labels.snp_names).size();i++)
-				(*p_Parameters).snps.valueset.insert(i);
+				(*p_Parameters).snps.numbersset.insert(i);
 			cout<<"SNPS VALUE SET CHANGED TO ALL"<<endl;
 		}
 	}

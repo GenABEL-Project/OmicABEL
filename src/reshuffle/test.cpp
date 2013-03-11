@@ -52,6 +52,12 @@ void test::run(){
 
 	test_txt<<"START TEST "<<name<<"\t";
 	iout_file iout_F(*Params_test);
+	if(Params_test->traits.use)
+		Params_test->traits.setbynames(*(iout_F.labels.trait_names));
+	if(Params_test->snps.use)
+		Params_test->snps.setbynames(*(iout_F.labels.snp_names));
+	if(Params_test->heritabilities.use)
+		Params_test->heritabilities.setbynames(*(iout_F.labels.trait_names));
 	Reshuffle reshh(iout_F,*Params_test);
 	reshh.run();
 	//result="datadims/datadims.txt";
@@ -61,11 +67,13 @@ void test::run(){
 	string str_res="";
 	string str_che="";
 	int checker=0;
-	while (getline(result_f,str_res)){
-		getline(check_f,str_che);
-		if(strcmp(str_che.c_str(),str_res.c_str()))
+	while (getline(check_f,str_che)){
+		getline(result_f,str_res);
+		if(strcmp(str_che.c_str(),str_res.c_str())!=0)
 			checker++;
 	}
+	if(getline(result_f,str_res))
+		checker++;
 	if(checker!=0){
 		test_txt<<"Test "<<name<<" FAILED!!!"<<endl;
 	}else

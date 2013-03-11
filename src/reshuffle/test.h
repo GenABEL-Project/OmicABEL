@@ -19,7 +19,6 @@ public:
 	string result;
 	string check;
 	Parameters Params;
-
 	Parameters *Params_test=&Params;
 	test(string,string,string,string);
 	void run();

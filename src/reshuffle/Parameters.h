@@ -11,6 +11,7 @@
 #include <iostream>
 #include <string>
 #include <set>
+#include <vector>
 using namespace std;
 
 class Parameter {
@@ -21,8 +22,10 @@ public:
 	string value; 	// value of parametr,chars after "=" symbol
 	Parameter(string,string); 	//constructor
 	Parameter();		//default constructor
-	set<int> valueset;
+	set<int> numbersset;
+	set<string> namesset;
 	string delfromcmdline(string);
+	void setbynames(vector<string>);
 };
 
 ostream &operator <<(ostream &, Parameter);

@@ -14,4 +14,15 @@ ver 0.002
 		heritabilities->estimates.txt
 		dataslim,chi->slim_data.txt
 		
+ver 0.003
+	bug in traitsbynames test fixed
+	Write data by trait's names
+	Write data by snp's names
+	Write estimates by trait's names
+	All combinations with this parameters
+	Write data by snp's name and snps around it 
+	Write data by regexp in the begining of trait's	names
+	
+	
+		
 		

@@ -105,6 +105,12 @@ int main(int argc, char* argv[]) {
 		cout<<iout_F.header;
 		cout<<iout_F.labels;
 	}
+	if(Params.traits.use)
+		Params.traits.setbynames(*(iout_F.labels.trait_names));
+	if(Params.snps.use)
+		Params.snps.setbynames(*(iout_F.labels.snp_names));
+	if(Params.heritabilities.use)
+		Params.heritabilities.setbynames(*(iout_F.labels.trait_names));
 	Reshuffle reshh(iout_F,Params);
 	reshh.run();
 	cout << "finish_reshuffling " << double(clock()) / CLOCKS_PER_SEC << endl;

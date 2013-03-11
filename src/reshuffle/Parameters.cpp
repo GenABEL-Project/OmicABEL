@@ -31,8 +31,11 @@ Parameter::Parameter() {
 ostream &operator <<(ostream &os, Parameter par) {
 	os << "PARAMETR" << "\t" << par.name << "\t" << "USE" << "\t" << par.use
 			<< "\t" << "VALUE" << "\t" << par.value;
-	cout<<"\tValue set ";
-	for (set<int>::iterator it= par.valueset.begin();it!=par.valueset.end();it++)
+	cout<<"\tNumbers set ";
+	for (set<int>::iterator it= par.numbersset.begin();it!=par.numbersset.end();it++)
+		os <<*it<<" ";
+	cout<<"\tNames set ";
+	for (set<string>::iterator it= par.namesset.begin();it!=par.namesset.end();it++)
 		os <<*it<<" ";
 	os<<endl;
 	return os;
@@ -90,10 +93,13 @@ Parameter::Parameter(string cmdline, string paramname) {
 							end+=str_tmp[i];
 						}
 						for(int i=atoi(start.c_str())-1;i<atoi(end.c_str());i++){
-							valueset.insert(i);
+							numbersset.insert(i);
 						}
-					}else if(atoi(str_tmp.c_str())!=0)
-						valueset.insert(atoi(str_tmp.c_str())-1);
+					}else if(atoi(str_tmp.c_str())!=0){
+						numbersset.insert(atoi(str_tmp.c_str())-1);
+					}else{
+						namesset.insert(str_tmp);
+					}
 
 					str_tmp="";
 				}
@@ -144,4 +150,67 @@ Parameters::Parameters(int argc,char* argv[]) {
 	cmdline=	dataslim.delfromcmdline(cmdline);
 	test= Parameter(cmdline, "test");
 	cmdline=test.delfromcmdline(cmdline);
+}
+
+void Parameter::setbynames(vector<string> names){
+	int find=0;
+	int before=0;
+	int after=0;
+	string regexp="";
+	if(name=="snps"){
+		for (set<string>::iterator nameit=namesset.begin();nameit!=namesset.end();++nameit){
+			string tmp=*nameit;
+			if(tmp.find("before")!=string::npos){
+				tmp.erase(0,7);
+				before = atoi(tmp.c_str());
+			}
+			if(tmp.find("after")!=string::npos){
+				tmp.erase(0,6);
+				after = atoi(tmp.c_str());
+			}
+			if(((*nameit).find("before")==string::npos)&&((*nameit).find("after")==string::npos)){
+				for(int i=0;i<names.size();i++){
+					if(names[i]==*nameit){
+						for(int k=(i-before);k<(i+after+1);k++){
+							numbersset.insert(k);
+						}
+						find=1;
+						break;
+					}
+				}
+				if(find==1)
+					continue;
+			}
+		}
+	}
+	if(name=="traits"||name=="heritabilities"){
+		for (set<string>::iterator nameit=namesset.begin();nameit!=namesset.end();++nameit){
+			string tmp=*nameit;
+			if(tmp.find("regexp")!=string::npos){
+				tmp.erase(0,7);
+				regexp = tmp;
+				cout<<"REGEXP="<<regexp<<endl;
+			}
+		}
+			for (set<string>::iterator nameit=namesset.begin();nameit!=namesset.end();++nameit){
+				if((*nameit).find("regexp")==string::npos){
+					for(int i=0;i<names.size();i++){
+						if(names[i]==*nameit){
+							numbersset.insert(i);
+							find=1;
+							break;
+						}
+					}
+					if(find==1)
+						continue;
+				}else{
+					for(int i=0;i<names.size();i++){
+						if((names[i]).find(regexp)==0){
+							numbersset.insert(i);
+							find=1;
+						}
+					}
+				}
+			}
+		}
 }

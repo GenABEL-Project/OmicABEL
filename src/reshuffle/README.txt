@@ -8,57 +8,72 @@ For the first it should be file name without iout and out extensions:
 
 Data dimensions 
 	(--datadims)  Gives back t, m, p
-output: "datadims//datadims.txt"
+output: "datadims.txt"
 
 SNP names
 	default: (--snpnames) : all
 	by index (--snpnames=27) : name of snp#27
 	by index range, combination (--snpnames=27,2-12,4-20) : name of snp #2-20,27
-output: "snpnames//snpnames.txt"
+output: "snpnames.txt"
 	
 Trait names 
 	default (--traitnames): all
 	by index (--traitnames=27) : name of trait #27
 	by index range, combination (--traitnames=27,2-12,15)
-output: "traitnames//traitnames.txt"
+output: "traitnames.txt"
 
 Heritabilities, sigma, res_sigma, estimates
 	Default: (--heritabilities) : all traits
 	Reange,indexes (--heritabilities=1-10,4,5-12) : for traits #1-12
-output: "estimates//estimates.txt"	
+	trait's names (--heritabilities=hgta,hdla) : for traits hgta,hdla
+	regexp in trait's names (--heritabilities=regexp=t) : for traits, in the start of which is "t" : tga,tca (in data_4test)
+	all combinations (--heritabilities=1-10,4,5-12,hgta,lipid_tca,regexp=lipid_)
+output: "estimates.txt"	
 Results - association
 	by SNP
 		Dafault (--snp) : for all snp for all traits
 		indexes, ranges (--snp=12,100-1000,500-10000,22000) :  for all traits
-	output: "data//[trait].txt"
+		names (--snp=rs3121561,rs6687776) : for snps rs3121561,rs6687776
+		names+around (--snp=rs3121561,rs6687776,before=10,after=15)
+			for  (-10,9,...,-1,rs3121561,1,2,...,15,16) + (-10,9,...,-1,rs6687776,1,2,...,15,16)
+		indexes+names+focus (--snp=1-20,50,rs3121561,rs6687776,before=10,after=15)
+			for snps : #1-20,50 + (-10,9,...,-1,rs324001,1,2,...,15,16) + (-10,9,...,-1,rs123123,1,2,...,15,16)
+			NB!: focus only for snp's names, not for indexes
+	output: "data.txt"
 	by trait
 		Dafault (--trait) : for all snp for all traits
 		indexes,range (--trait=1-10,12) : for snp #12 for all traits
-	output: "data//[trait].txt"
+		by names (--traits=tca,hdla) : for traits tca,hdla
+		regexp in trait's names (traits=regexp=lipids_) : for all traits, which name in the beginig has "lipids_"
+		all combinations
+	output: "data.txt"
 	Chi2 more than some threshold
 		(--chi=20) for snps,which chi>20 for all traits
-	output: "chi_data//[trait].txt"
+	output: "chi_data.txt"
 	All combinations of traits,snps, Chi2
 		(--traits=1-2--snps=1-1000--chi=15) for traits #1-2 for snps#1-1000, which chi>15
-		output: "chi_data//[trait].txt"
+		output: "chi_data.txt"
 		
 Just write data with chi
 	(--chi) : write data(with chi column) for all snps for all traits
 	all combinations are supported
-	output: "chi_data//[trait].txt"
+	output: "chi_data.txt"
 Dataslim
 	Creating a sub-matrix by Chi2>X (--chi=X--dataslim)
-	output: "slim_data//slim_[trait].txt"
+	output: "slim_data.txt"
 	
 Test
 	(--test) run all tests
 	output: test.txt
+	
+Info 
+	(--info) write some information about programm's run
 
 Examples:
 Reshuffle.exe B_1112_NA_clear_RNA_nocovar --traitnames=1-4,1--snpnames=1-10,20-30,46--traits=1--snps=1-100
 
 outputs from B_1112_NA_clear_RNA_nocovar.iout and B_1112_NA_clear_RNA_nocovar.out:
 
-	traitnames//traitnames.txt : with trait's names hgta,tga,tca,ldla
-	snpnames//snpnames.txt Names of snps #1-10,20-30,46
-	data//trait_hgta.txt : result of association for trait "hgta" for snps #1-100
+	traitnames.txt : with trait's names hgta,tga,tca,ldla
+	snpnames.txt Names of snps #1-10,20-30,46
+	trait_hgta.txt : result of association for trait "hgta" for snps #1-100
