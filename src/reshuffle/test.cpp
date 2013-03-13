@@ -12,7 +12,7 @@ using namespace std;
 
 ofstream test_txt("test.txt");
 test::test(string Name,string cmd,string Result,string Check){
-
+	Params_test= new Parameters;
 	name=Name;
 	result=Result;
 	check=Check;
@@ -45,11 +45,9 @@ test::test(string Name,string cmd,string Result,string Check){
 		Params_test->dataslim = Parameter(cmd,"dataslim");
 		Params_test->chi = Parameter(cmd,"chi");
 	}
-
 }
 
 void test::run(){
-
 	test_txt<<"START TEST "<<name<<"\t";
 	iout_file iout_F(*Params_test);
 	if(Params_test->traits.use)
@@ -60,8 +58,6 @@ void test::run(){
 		Params_test->heritabilities.setbynames(*(iout_F.labels.trait_names));
 	Reshuffle reshh(iout_F,*Params_test);
 	reshh.run();
-	//result="datadims/datadims.txt";
-	//check="data_4test_check/datadims/datadims.txt";
 	ifstream result_f(result.c_str());
 	ifstream check_f(check.c_str());
 	string str_res="";
@@ -80,7 +76,7 @@ void test::run(){
 		test_txt<<"Test "<<name<<" OK"<<endl;
 
 	//TODO: remove doesn't work from test.cpp
-	/*if(remove(result.c_str()) != 0 )
+	/*if(remove(result.c_strf()) != 0 )
 	  cout<<"Error deleting file";*/
 
 }

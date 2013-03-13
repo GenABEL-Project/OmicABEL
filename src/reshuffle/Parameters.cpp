@@ -4,7 +4,7 @@
  *  Created on: 28.02.2013
  *      Author: Sodbo
  */
-#include "parameters.h"
+#include "Parameters.h"
 #include <stdlib.h>
 #include <string>
 using namespace std;

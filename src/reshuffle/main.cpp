@@ -7,8 +7,8 @@
 #include <iostream>
 #include <ctime>
 #include "iout_file.h"
-#include "parameters.h"
-#include "Reshuffle.h"
+#include "Parameters.h"
+#include "reshuffle.h"
 #include <iterator>
 #include "test.h"
 //TODO Create Makefile
@@ -20,11 +20,9 @@ int main(int argc, char* argv[]) {
 	Parameters Params(argc, argv);
 	//mkdir("TEST");
 	if(Params.test.use){
-
 		test t_datadims("datadims","--datadims--","datadims.txt","data_4test_check/datadims.txt");
 		t_datadims.run();
 		remove(t_datadims.result.c_str());
-
 		test t_snpnamesdef("snpnamesdef","--snpnames--","snpnames.txt","data_4test_check/snpnamesdef.txt");
 		t_snpnamesdef.run();
 		remove(t_snpnamesdef.result.c_str());
@@ -114,5 +112,5 @@ int main(int argc, char* argv[]) {
 	Reshuffle reshh(iout_F,Params);
 	reshh.run();
 	cout << "finish_reshuffling " << double(clock()) / CLOCKS_PER_SEC << endl;
-	return 0;
+	return (0);
 }

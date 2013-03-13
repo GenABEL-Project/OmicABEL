@@ -7,7 +7,7 @@
 
 #ifndef RESHUFFLE_H_
 #define RESHUFFLE_H_
-#include "parameters.h"
+#include "Parameters.h"
 #include "iout_file.h"
 
 using namespace std;
