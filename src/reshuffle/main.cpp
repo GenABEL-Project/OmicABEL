@@ -11,12 +11,11 @@
 #include "reshuffle.h"
 #include <iterator>
 #include "test.h"
-//TODO Create Makefile
 
 using namespace std;
 
 int main(int argc, char* argv[]) {
-	cout << "Every day I'm [re]shuf1fling!" << endl;
+	//cout << "Every day I'm [re]shuffeling!" << endl;
 	Parameters Params(argc, argv);
 	//mkdir("TEST");
 	if(Params.test.use){
