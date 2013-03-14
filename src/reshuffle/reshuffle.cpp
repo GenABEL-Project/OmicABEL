@@ -81,19 +81,6 @@ void Reshuffle::write_data(ifstream& out_file){
 		txt_trait << (*(*p_iout_file).labels.cov)[cov] << "\t";
 	txt_trait << endl;
 	for (set<int>::iterator trait= (*p_Parameters).traits.numbersset.begin();trait!=(*p_Parameters).traits.numbersset.end();trait++) {
-
-		//Set precision of double
-	/*//	cout<<(*(*p_iout_file).labels.trait_names)[*trait]<<endl;
-		txt_trait.precision(PRECISION_DOUBLE);
-		txt_trait<<"SNP\t";
-		txt_trait<<	"Trait\t";
-		for (int beta = 0;	beta < (*(*p_iout_file).labels.beta).size(); beta++)
-			txt_trait << (*(*p_iout_file).labels.beta)[beta] << "\t";
-		for (int se = 0;se < (*(*p_iout_file).labels.se).size(); se++)
-			txt_trait << (*(*p_iout_file).labels.se)[se] << "\t";
-		for (int cov = 0;cov < (*(*p_iout_file).labels.cov).size(); cov++)
-			txt_trait << (*(*p_iout_file).labels.cov)[cov] << "\t";
-		txt_trait << endl;*/
 		cout << "endwritetrait_colnames" << *trait << clock() << endl;
 		double* buf = new double[per_trait_per_snp];
 		int oldPos = 0;
@@ -128,18 +115,18 @@ void Reshuffle::write_data_chi(ifstream& out_file){
 	double CheckChi = (*p_Parameters).chi.value == "all" ? -1.0 : atof((*p_Parameters).chi.value.c_str());
 	cout << "startwritetxt=" << double(clock()) / CLOCKS_PER_SEC << endl;
 	ofstream txt_chi(create_filename("chi_data").c_str());
+	txt_chi.precision(PRECISION_DOUBLE);
+	txt_chi << "SNP\t";
+	txt_chi << "Trait\t";
+	for (int beta = 0;	beta < (*(*p_iout_file).labels.beta).size(); beta++)
+		txt_chi << (*(*p_iout_file).labels.beta)[beta] << "\t";
+	for (int se = 0;se < (*(*p_iout_file).labels.se).size(); se++)
+		txt_chi << (*(*p_iout_file).labels.se)[se] << "\t";
+	for (int cov = 0;cov < (*(*p_iout_file).labels.cov).size(); cov++)
+		txt_chi << (*(*p_iout_file).labels.cov)[cov] << "\t";
+	txt_chi << "Chi2" << endl;
 	for (set<int>::iterator trait= (*p_Parameters).traits.numbersset.begin();trait!=(*p_Parameters).traits.numbersset.end();trait++) {
 		//ofstream txt_chi(create_filename("chi_data//chi", (*(*p_iout_file).labels.trait_names)[*trait]).c_str());
-		//Set precision of double
-		txt_chi.precision(PRECISION_DOUBLE);
-		txt_chi<<	(*(*p_iout_file).labels.trait_names)[*trait]<<endl;
-		for (int beta = 0;	beta < (*(*p_iout_file).labels.beta).size(); beta++)
-			txt_chi << (*(*p_iout_file).labels.beta)[beta] << "\t";
-		for (int se = 0;se < (*(*p_iout_file).labels.se).size(); se++)
-			txt_chi << (*(*p_iout_file).labels.se)[se] << "\t";
-		for (int cov = 0;cov < (*(*p_iout_file).labels.cov).size(); cov++)
-			txt_chi << (*(*p_iout_file).labels.cov)[cov] << "\t";
-		txt_chi << "Chi2" << endl;
 		double* buf = new double[per_trait_per_snp];
 		int oldPos = 0;
 		char s[30];
@@ -155,6 +142,7 @@ void Reshuffle::write_data_chi(ifstream& out_file){
 			chi=pow((buf[(*(*p_iout_file).labels.beta).size()-1]/buf[(*(*p_iout_file).labels.beta).size()+(*(*p_iout_file).labels.se).size()-1]),2);
 			if(chi>CheckChi){
 				txt_chi << (*(*p_iout_file).labels.snp_names)[*snp] << "\t";
+				txt_chi << (*(*p_iout_file).labels.trait_names)[*trait]<<"\t";
 				for (int i = 0; i < per_trait_per_snp; i++) {
 					sprintf(s, "%.15g", buf[i]);
 					txt_chi << s << "\t";
@@ -203,23 +191,22 @@ void Reshuffle::write_slim_data(ifstream& out_file){
 	}
 	out_file.seekg(0, ios_base::beg);
 	ofstream txt_slim(create_filename("slim_data").c_str());
-
+	txt_slim << "SNP\t";
+	txt_slim << "Trait\t";
+	for (int beta = 0;	beta < (*(*p_iout_file).labels.beta).size(); beta++)
+		txt_slim << (*(*p_iout_file).labels.beta)[beta] << "\t";
+	for (int se = 0;se < (*(*p_iout_file).labels.se).size(); se++)
+		txt_slim << (*(*p_iout_file).labels.se)[se] << "\t";
+	for (int cov = 0;cov < (*(*p_iout_file).labels.cov).size(); cov++)
+		txt_slim << (*(*p_iout_file).labels.cov)[cov] << "\t";
+	txt_slim << "Chi2" << endl;
 	for (set<int>::iterator trait= goodtraits.begin();trait!=goodtraits.end();trait++) {
-		//Set precision of double
-		txt_slim.precision(PRECISION_DOUBLE);
-		txt_slim<<	(*(*p_iout_file).labels.trait_names)[*trait]<<endl;
-		for (int beta = 0;	beta < (*(*p_iout_file).labels.beta).size(); beta++)
-			txt_slim << (*(*p_iout_file).labels.beta)[beta] << "\t";
-		for (int se = 0;se < (*(*p_iout_file).labels.se).size(); se++)
-			txt_slim << (*(*p_iout_file).labels.se)[se] << "\t";
-		for (int cov = 0;cov < (*(*p_iout_file).labels.cov).size(); cov++)
-			txt_slim << (*(*p_iout_file).labels.cov)[cov] << "\t";
-		txt_slim << "Chi2" << endl;
 		double* buf = new double[per_trait_per_snp];
 		int oldPos = 0;
 		char s[30];
 		for (set<int>::iterator snp= goodsnps.begin();snp!=goodsnps.end();snp++) {
 			txt_slim << (*(*p_iout_file).labels.snp_names)[*snp] << "\t";
+			txt_slim << (*(*p_iout_file).labels.trait_names)[*trait]<<"\t";
 			int pos = (*p_iout_file).tilecoordinates(*trait, *snp);
 			//cout << oldPos << "-" << pos << endl;
 			if(pos != oldPos)
