@@ -85,9 +85,9 @@ int main( int argc, char *argv[] )
 	/*exit(EXIT_FAILURE);*/
 	/*}*/
 	
-	printf("\n**************************************************************************\n");
-	printf("*** This is an alpha version under development. Use it at your own risk!!!\n");
-	printf("**************************************************************************\n\n");
+	/*printf("\n**************************************************************************\n");*/
+	/*printf("*** This is an alpha version under development. Use it at your own risk!!!\n");*/
+	/*printf("**************************************************************************\n\n");*/
 	print_info( &cf );
 
 	// Compute h and sigma
@@ -496,9 +496,9 @@ void print_info( FGLS_config_t *cf )
 	fflush( stdout );
 
 	if ( cf->var[0] == 'c' )
-		printf( "\nWill use OmicABEL-Chol with the following parameters\n" );
+		printf( "\nWill use CLAK-Chol with the following parameters\n" );
 	else
-		printf( "\nWill use OmicABEL-Eigen with the following parameters:\n" );
+		printf( "\nWill use CLAK-Eig with the following parameters:\n" );
 	printf( "  x_b: %zu\n", cf->x_b );
 	printf( "  y_b: %zu\n", cf->y_b );
 	printf( "  o_b: %zu\n", cf->ooc_b );

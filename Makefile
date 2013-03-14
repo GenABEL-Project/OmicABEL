@@ -3,7 +3,7 @@ include ./make.inc
 SRCDIR = ./src
 DRIVER = ./HP-GWAS
 
-CFLAGS+=-g -Wall -I $(SRCDIR)/  # -D__WORDSIZE=64
+CFLAGS+=-g -O2  -Wall -I $(SRCDIR)/  # -D__WORDSIZE=64
 LDLIBS += -lm
 
 SRCS = $(SRCDIR)/CLAK_GWAS.c $(SRCDIR)/fgls_chol.c $(SRCDIR)/fgls_eigen.c $(SRCDIR)/wrappers.c $(SRCDIR)/timing.c $(SRCDIR)/statistics.c $(SRCDIR)/REML.c $(SRCDIR)/optimization.c $(SRCDIR)/ooc_BLAS.c $(SRCDIR)/double_buffering.c $(SRCDIR)/utils.c $(SRCDIR)/GWAS.c $(SRCDIR)/databel.c 
