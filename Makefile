@@ -1,7 +1,7 @@
 include ./make.inc
 
 SRCDIR = ./src
-DRIVER = ./HP-GWAS
+DRIVER = ./CLAK-GWAS
 
 CFLAGS+=-g -O2  -Wall -I $(SRCDIR)/  # -D__WORDSIZE=64
 LDLIBS += -lm
