@@ -1,26 +1,39 @@
 include ./make.inc
 
 SRCDIR = ./src
+RESH_SRCDIR = ./src/reshuffle
 DRIVER = ./CLAK-GWAS
 
+#QUICK and DIRTY
+CXX=g++
+
 CFLAGS+=-g -O2  -Wall -I $(SRCDIR)/  # -D__WORDSIZE=64
+CXXFLAGS+=-g -O2  -Wall
 LDLIBS += -lm
 
 SRCS = $(SRCDIR)/CLAK_GWAS.c $(SRCDIR)/fgls_chol.c $(SRCDIR)/fgls_eigen.c $(SRCDIR)/wrappers.c $(SRCDIR)/timing.c $(SRCDIR)/statistics.c $(SRCDIR)/REML.c $(SRCDIR)/optimization.c $(SRCDIR)/ooc_BLAS.c $(SRCDIR)/double_buffering.c $(SRCDIR)/utils.c $(SRCDIR)/GWAS.c $(SRCDIR)/databel.c 
 OBJS = $(SRCS:.c=.o)
+RESH_SRCS=$(RESH_SRCDIR)/main.cpp $(RESH_SRCDIR)/iout_file.cpp $(RESH_SRCDIR)/Parameters.cpp $(RESH_SRCDIR)/reshuffle.cpp $(RESH_SRCDIR)/test.cpp
+RESH_OBJS = $(RESH_SRCS:.cpp=.o)
 
-.PHONY: all clean
+.PHONY: all clean reshuffle
 
-all: $(DRIVER)
+all: $(DRIVER) reshuffle
 
 $(DRIVER): $(OBJS)
 	$(CC) $(CFLAGS) $^ $(LDFLAGS) $(LDLIBS) -o $@
 
+reshuffle: $(RESH_OBJS)
+	cd src/reshuffle
+	$(CXX) $^ -o $(RESH_SRCDIR)/reshuffle
+
 clean:
 	$(RM) $(OBJS)
-	$(RM) $(DRIVER) $(EXE_GPU);
+	$(RM) $(DRIVER) 
 	$(RM) $(SRCDIR)/*mod*
 	$(RM) $(SRCDIR)/*opari_GPU*
+	$(RM) $(RESH_OBJS)
+	$(RM) $(RESH_SRCDIR)/reshuffle
 
 
 src/CLAK_GWAS.o: src/CLAK_GWAS.c src/wrappers.h src/utils.h src/GWAS.h \
