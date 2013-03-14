@@ -2,7 +2,8 @@ include ./make.inc
 
 SRCDIR = ./src
 RESH_SRCDIR = ./src/reshuffle
-DRIVER = ./CLAK-GWAS
+CLAKGWAS  = ./bin/CLAK-GWAS
+RESHUFFLE = ./bin/reshuffle
 
 #QUICK and DIRTY
 CXX=g++
@@ -16,16 +17,27 @@ OBJS = $(SRCS:.c=.o)
 RESH_SRCS=$(RESH_SRCDIR)/main.cpp $(RESH_SRCDIR)/iout_file.cpp $(RESH_SRCDIR)/Parameters.cpp $(RESH_SRCDIR)/reshuffle.cpp $(RESH_SRCDIR)/test.cpp
 RESH_OBJS = $(RESH_SRCS:.cpp=.o)
 
-.PHONY: all clean reshuffle
+.PHONY: all clean
 
-all: $(DRIVER) reshuffle
+all: ./bin/ $(CLAKGWAS) $(RESHUFFLE) 
 
-$(DRIVER): $(OBJS)
+./bin:
+	mkdir bin
+
+$(CLAKGWAS): $(OBJS)
 	$(CC) $(CFLAGS) $^ $(LDFLAGS) $(LDLIBS) -o $@
 
-reshuffle: $(RESH_OBJS)
-	cd src/reshuffle
-	$(CXX) $^ -o $(RESH_SRCDIR)/reshuffle
+$(RESHUFFLE): $(RESH_OBJS)
+	cd $(RESH_SRCDIR)
+	$(CXX) $^ -o $@
+
+bindist: ./bin/ $(CLAKGWAS) $(RESHUFFLE)
+	mkdir CLAK-GWAS-bin
+	mkdir CLAK-GWAS-bin/bin/
+	cp -a $(CLAKGWAS) $(RESHUFFLE) CLAK-GWAS-bin/bin/
+	cp -a COPYING LICENSE CLAK-GWAS-bin
+	tar -czvf CLAK-GWAS-bin.tgz CLAK-GWAS-bin
+	rm -rf CLAK-GWAS-bin/
 
 clean:
 	$(RM) $(OBJS)
@@ -33,7 +45,7 @@ clean:
 	$(RM) $(SRCDIR)/*mod*
 	$(RM) $(SRCDIR)/*opari_GPU*
 	$(RM) $(RESH_OBJS)
-	$(RM) $(RESH_SRCDIR)/reshuffle
+	$(RM) $(RESHUFFLE)
 
 
 src/CLAK_GWAS.o: src/CLAK_GWAS.c src/wrappers.h src/utils.h src/GWAS.h \
