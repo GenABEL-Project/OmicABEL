@@ -69,25 +69,38 @@ void Reshuffle::write_data(ifstream& out_file){
 	out_file.seekg(0, ios_base::beg);
 	cout << "startwritetxt=" << double(clock()) / CLOCKS_PER_SEC << endl;
 	ofstream txt_trait(create_filename("data").c_str());
+	//	cout<<(*(*p_iout_file).labels.trait_names)[*trait]<<endl;
+	txt_trait.precision(PRECISION_DOUBLE);
+	txt_trait<<"SNP\t";
+	txt_trait<<	"Trait\t";
+	for (int beta = 0;	beta < (*(*p_iout_file).labels.beta).size(); beta++)
+		txt_trait << (*(*p_iout_file).labels.beta)[beta] << "\t";
+	for (int se = 0;se < (*(*p_iout_file).labels.se).size(); se++)
+		txt_trait << (*(*p_iout_file).labels.se)[se] << "\t";
+	for (int cov = 0;cov < (*(*p_iout_file).labels.cov).size(); cov++)
+		txt_trait << (*(*p_iout_file).labels.cov)[cov] << "\t";
+	txt_trait << endl;
 	for (set<int>::iterator trait= (*p_Parameters).traits.numbersset.begin();trait!=(*p_Parameters).traits.numbersset.end();trait++) {
 
 		//Set precision of double
-		cout<<(*(*p_iout_file).labels.trait_names)[*trait]<<endl;
+	/*//	cout<<(*(*p_iout_file).labels.trait_names)[*trait]<<endl;
 		txt_trait.precision(PRECISION_DOUBLE);
-		txt_trait<<	(*(*p_iout_file).labels.trait_names)[*trait]<<endl;
+		txt_trait<<"SNP\t";
+		txt_trait<<	"Trait\t";
 		for (int beta = 0;	beta < (*(*p_iout_file).labels.beta).size(); beta++)
 			txt_trait << (*(*p_iout_file).labels.beta)[beta] << "\t";
 		for (int se = 0;se < (*(*p_iout_file).labels.se).size(); se++)
 			txt_trait << (*(*p_iout_file).labels.se)[se] << "\t";
 		for (int cov = 0;cov < (*(*p_iout_file).labels.cov).size(); cov++)
 			txt_trait << (*(*p_iout_file).labels.cov)[cov] << "\t";
-		txt_trait << endl;
+		txt_trait << endl;*/
 		cout << "endwritetrait_colnames" << *trait << clock() << endl;
 		double* buf = new double[per_trait_per_snp];
 		int oldPos = 0;
 		char s[30];
 		for (set<int>::iterator snp= (*p_Parameters).snps.numbersset.begin();snp!=(*p_Parameters).snps.numbersset.end();snp++) {
 			txt_trait << (*(*p_iout_file).labels.snp_names)[*snp] << "\t";
+			txt_trait << (*(*p_iout_file).labels.trait_names)[*trait]<<"\t";
 			int pos = (*p_iout_file).tilecoordinates(*trait, *snp);
 			//cout << oldPos << "-" << pos << endl;
 			if(pos != oldPos)
