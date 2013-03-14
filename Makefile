@@ -32,12 +32,12 @@ $(RESHUFFLE): $(RESH_OBJS)
 	$(CXX) $^ -o $@
 
 bindist: ./bin/ $(CLAKGWAS) $(RESHUFFLE)
-	mkdir CLAK-GWAS-bin
-	mkdir CLAK-GWAS-bin/bin/
-	cp -a $(CLAKGWAS) $(RESHUFFLE) CLAK-GWAS-bin/bin/
-	cp -a COPYING LICENSE CLAK-GWAS-bin
-	tar -czvf CLAK-GWAS-bin.tgz CLAK-GWAS-bin
-	rm -rf CLAK-GWAS-bin/
+	mkdir OmicABEL-bin
+	mkdir OmicABEL-bin/bin/
+	cp -a $(CLAKGWAS) $(RESHUFFLE) OmicABEL-bin/bin/
+	cp -a COPYING LICENSE OmicABEL-bin
+	tar -czvf OmicABEL-bin.tgz OmicABEL-bin
+	rm -rf OmicABEL-bin/
 
 clean:
 	$(RM) $(OBJS)
