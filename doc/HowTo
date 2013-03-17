@@ -76,4 +76,4 @@ are mandatory.
 
 
 For a detail description of the options for "reshuffle", please
-see src/reshuffle/README.txt
+see doc/README-reshuffle

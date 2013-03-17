@@ -13,14 +13,14 @@ A copy of the license is available in the file ''COPYING''
 1. INSTALLATION
 ----------------
 
-Please see the INSTALL file (only necessary if you didn't download a 
+Please see the doc/INSTALL file (only necessary if you didn't download a 
 precompiled version).
 
 
 2. USING CLAK-GWAS
 -------------------
 
-Please see the HowTo file.
+Please see the doc/HowTo file.
 
 
 3. KNOWN ISSUES

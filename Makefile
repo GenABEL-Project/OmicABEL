@@ -31,13 +31,18 @@ $(RESHUFFLE): $(RESH_OBJS)
 	cd $(RESH_SRCDIR)
 	$(CXX) $^ -o $@
 
+# Dirty, improve
+platform=Linux
+bindistDir=OmicABEL-$(platform)-bin
 bindist: ./bin/ $(CLAKGWAS) $(RESHUFFLE)
-	mkdir OmicABEL-bin
-	mkdir OmicABEL-bin/bin/
-	cp -a $(CLAKGWAS) $(RESHUFFLE) OmicABEL-bin/bin/
-	cp -a COPYING LICENSE OmicABEL-bin
-	tar -czvf OmicABEL-bin.tgz OmicABEL-bin
-	rm -rf OmicABEL-bin/
+	mkdir $(bindistDir)
+	mkdir $(bindistDir)/bin/
+	mkdir $(bindistDir)/doc/
+	cp -a $(CLAKGWAS) $(RESHUFFLE) $(bindistDir)/bin/
+	cp -a COPYING LICENSE README DISCLAIMER.$(platform) $(bindistDir)
+	cp -a doc/README-reshuffle doc/INSTALL doc/HowTo $(bindistDir)/doc
+	tar -czvf $(bindistDir).tgz $(bindistDir)
+	rm -rf $(bindistDir)
 
 clean:
 	$(RM) $(OBJS)
