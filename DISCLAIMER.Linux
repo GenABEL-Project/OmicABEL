@@ -1,0 +1,6 @@
+The Linux precompiled binary for CLAK-GWAS provided in this package
+includes libraries distributed under their respective licenses. 
+This is the case for the Intel (R) Math Kernel Library (MKL). 
+Under the terms of the Intel MKL License we redistribute 
+computational portions of Intel MKL with our software to 
+improve the user experience.
