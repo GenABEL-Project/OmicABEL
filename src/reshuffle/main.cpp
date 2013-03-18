@@ -15,9 +15,8 @@
 using namespace std;
 
 int main(int argc, char* argv[]) {
-	//cout << "Every day I'm [re]shuffeling!" << endl;
+	cout<<"Start reshuffeling"<<endl;
 	Parameters Params(argc, argv);
-	//mkdir("TEST");
 	if(Params.test.use){
 		test t_datadims("datadims","--datadims--","datadims.txt","data_4test_check/datadims.txt");
 		t_datadims.run();
@@ -97,7 +96,7 @@ int main(int argc, char* argv[]) {
 	if(Params.info.use)
 		cout << Params;
 	iout_file iout_F(Params);
-	cout << "finish iout_file read " << double(clock()) / CLOCKS_PER_SEC << endl;
+	cout << "Finish iout_file read\t" << double(clock()) / CLOCKS_PER_SEC <<" sec" << endl;
 	if(Params.info.use){
 		cout<<iout_F.header;
 		cout<<iout_F.labels;
@@ -110,6 +109,6 @@ int main(int argc, char* argv[]) {
 		Params.heritabilities.setbynames(*(iout_F.labels.trait_names));
 	Reshuffle reshh(iout_F,Params);
 	reshh.run();
-	cout << "finish_reshuffling " << double(clock()) / CLOCKS_PER_SEC << endl;
+	cout << "Finish reshuffling " << double(clock()) / CLOCKS_PER_SEC <<" sec" << endl;
 	return (0);
 }

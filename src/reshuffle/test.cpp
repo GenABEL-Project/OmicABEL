@@ -19,31 +19,31 @@ test::test(string Name,string cmd,string Result,string Check){
 	Params_test->iout_fname="data_4test/4test.iout";
 	Params_test->out_fname="data_4test/4test.out";
 	if(name=="datadims")
-		Params_test->datadims = Parameter(cmd,"datadims");
+		Params_test->datadims = Parameter(cmd,"datadims","datadims.txt");
 	if(name=="traitnamesdef"||name=="traitnames")
-		Params_test->traitnames = Parameter(cmd,"traitnames");
-	if(name=="snpnamesdef"||name=="snpnames")
-		Params_test->snpnames = Parameter(cmd,"snpnames");
+		Params_test->traitnames = Parameter(cmd,"traitnames","traitnames.txt");
+	if(name=="snpnamesdef"||name=="snpnames","snpnames.txt")
+		Params_test->snpnames = Parameter(cmd,"snpnames","snpnames.txt");
 	if(name=="traitsnumbers"||name=="traitsdef"||name=="traitsbynames")
-		Params_test->traits = Parameter(cmd,"traits");
+		Params_test->traits = Parameter(cmd,"traits","data.txt");
 	if(name=="snpsnumbers"||name=="snpsdef"||name=="snpsbynames")
-		Params_test->snps = Parameter(cmd,"snps");
+		Params_test->snps = Parameter(cmd,"snps","data.txt");
 	if(name=="traitssnpscombo"){
-		Params_test->traits=Parameter(cmd,"traits");
-		Params_test->snps=Parameter(cmd,"snps");
+		Params_test->traits=Parameter(cmd,"traits","data.txt");
+		Params_test->snps=Parameter(cmd,"snps","data.txt");
 	}
 	if(name=="chiall"||name=="chiover")
-		Params_test->chi = Parameter(cmd,"chi");
+		Params_test->chi = Parameter(cmd,"chi","chi_data.txt");
 	if(name=="traitssnpschicombo"){
-		Params_test->traits=Parameter(cmd,"traits");
-		Params_test->snps=Parameter(cmd,"snps");
-		Params_test->chi = Parameter(cmd,"chi");
+		Params_test->traits=Parameter(cmd,"traits","data.txt");
+		Params_test->snps=Parameter(cmd,"snps","data.txt");
+		Params_test->chi = Parameter(cmd,"chi","chi_data.txt");
 	}
 	if(name=="estdef"||name=="estnumbers"||name=="estnames")
-		Params_test->heritabilities = Parameter(cmd,"heritabilities");
+		Params_test->heritabilities = Parameter(cmd,"heritabilities","estimates.txt");
 	if(name=="dataslim"){
-		Params_test->dataslim = Parameter(cmd,"dataslim");
-		Params_test->chi = Parameter(cmd,"chi");
+		Params_test->dataslim = Parameter(cmd,"dataslim","slim_data.txt");
+		Params_test->chi = Parameter(cmd,"chi","chi_data.txt");
 	}
 }
 
