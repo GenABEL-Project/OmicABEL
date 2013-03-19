@@ -13,14 +13,16 @@ A copy of the license is available in the file ''COPYING''
 1. INSTALLATION
 ----------------
 
-Please see the doc/INSTALL file (only necessary if you didn't download a 
-precompiled version).
+Please see the doc/INSTALL file. 
+
+Note that if you downloaded one of the binary versions, no 
+installation is needed.
 
 
 2. USING CLAK-GWAS
 -------------------
 
-Please see the doc/HowTo file.
+Please see the doc/HOWTO file.
 
 
 3. KNOWN ISSUES
@@ -32,15 +34,15 @@ Please see the doc/HowTo file.
      ( fabregat [at] aices [dot] rwth-aachen [dot] de ); we will attend 
      your request as soon as possible.
 
-3.2  Currently, we only support input data in DenABEL (filevector) data format
-     and double precision datatype. We are working on the support for
-	 more datatypes.
+3.2  Currently, the input data must consist of double precision entries, 
+     organized according to the DatABEL (filevector) data format.
+     We are working on the support for more datatypes.
 
 
 4. CONTACT
 -----------
 
-For any question, request, suggestion, or comment, please free to contact us:
+For any question, request, suggestion, or comment, please contact us:
 
 Diego Fabregat Traver,  fabregat [at] aices [dot] rwth-aachen [dot] de
 Paolo Bientinesi,       pauldj   [at] aices [dot] rwth-aachen [dot] de
