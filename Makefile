@@ -35,12 +35,13 @@ $(RESHUFFLE): $(RESH_OBJS)
 platform=Linux
 bindistDir=OmicABEL-$(platform)-bin
 bindist: ./bin/ $(CLAKGWAS) $(RESHUFFLE)
+	rm -rf $(bindistDir)
 	mkdir $(bindistDir)
 	mkdir $(bindistDir)/bin/
 	mkdir $(bindistDir)/doc/
 	cp -a $(CLAKGWAS) $(RESHUFFLE) $(bindistDir)/bin/
 	cp -a COPYING LICENSE README DISCLAIMER.$(platform) $(bindistDir)
-	cp -a doc/README-reshuffle doc/INSTALL doc/HowTo $(bindistDir)/doc
+	cp -a doc/README-reshuffle doc/INSTALL doc/HOWTO $(bindistDir)/doc
 	tar -czvf $(bindistDir).tgz $(bindistDir)
 	rm -rf $(bindistDir)
 
