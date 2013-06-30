@@ -81,12 +81,13 @@ void Reshuffle::write_data(ifstream& out_file,ofstream& data){
 	data << endl;
 	for (set<int>::iterator trait= (*p_Parameters).traits.numbersset.begin();trait!=(*p_Parameters).traits.numbersset.end();trait++) {
 		double* buf = new double[per_trait_per_snp];
-		int oldPos = 0;
+		int64_t oldPos = 0;
 		char s[30];
+		int64_t pos;
 		for (set<int>::iterator snp= (*p_Parameters).snps.numbersset.begin();snp!=(*p_Parameters).snps.numbersset.end();snp++) {
 			data << (*(*p_iout_file).labels.snp_names)[*snp] << "\t";
 			data << (*(*p_iout_file).labels.trait_names)[*trait]<<"\t";
-			int pos = (*p_iout_file).tilecoordinates(*trait, *snp);
+			pos = (*p_iout_file).tilecoordinates(*trait, *snp);
 			//cout << oldPos << "-" << pos << endl;
 			if(pos != oldPos)
 			{

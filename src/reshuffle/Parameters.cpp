@@ -62,7 +62,7 @@ ostream &operator <<(ostream &os, Parameters par) {
 Parameters::Parameters(){
 }
 
-//Constructor-parser from command line
+//Constructor-Parser from command line
 Parameter::Parameter(string cmdline, string paramname,string ofile) {
 
 	name = paramname;

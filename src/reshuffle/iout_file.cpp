@@ -78,8 +78,8 @@ ostream &operator <<(ostream &os,labels_data labels) {
 	os <<"NUMBER OF TRAITNAMES\t"<<(*labels.trait_names).size()<<endl;
 }
 
-int iout_file::tilecoordinates(int traitNo, int snpNo) {
-	int tileCoor = 0;
+int64_t iout_file::tilecoordinates(int traitNo, int snpNo) {
+	int64_t tileCoor = 0;
 	int t_tile = traitNo / header.tile_t;
 	int t_off = traitNo % header.tile_t;
 	int m_tile = snpNo / header.tile_m;
