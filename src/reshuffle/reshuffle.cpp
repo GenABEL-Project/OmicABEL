@@ -126,10 +126,11 @@ void Reshuffle::write_data_chi(ifstream& out_file,ofstream& txt_chi){
 	for (set<int>::iterator trait= (*p_Parameters).traits.numbersset.begin();trait!=(*p_Parameters).traits.numbersset.end();trait++) {
 		//ofstream txt_chi(create_filename("chi_data//chi", (*(*p_iout_file).labels.trait_names)[*trait]).c_str());
 		double* buf = new double[per_trait_per_snp];
-		int oldPos = 0;
+		int64_t oldPos = 0;
+		int64_t pos = 0;
 		char s[30];
 		for (set<int>::iterator snp= (*p_Parameters).snps.numbersset.begin();snp!=(*p_Parameters).snps.numbersset.end();snp++) {
-			int pos = (*p_iout_file).tilecoordinates(*trait, *snp);
+			pos = (*p_iout_file).tilecoordinates(*trait, *snp);
 			//cout << oldPos << "-" << pos << endl;
 			if(pos != oldPos)
 			{
@@ -168,10 +169,11 @@ void Reshuffle::write_slim_data(ifstream& out_file, ofstream& txt_slim){
 	double CheckChi = atof((*p_Parameters).chi.value.c_str());
 	for (set<int>::iterator trait= (*p_Parameters).traits.numbersset.begin();trait!=(*p_Parameters).traits.numbersset.end();trait++) {
 		double* buf = new double[per_trait_per_snp];
-		int oldPos = 0;
+		int64_t oldPos = 0;
+		int64_t pos = 0;
 		char s[30];
 		for (set<int>::iterator snp= (*p_Parameters).snps.numbersset.begin();snp!=(*p_Parameters).snps.numbersset.end();snp++) {
-			int pos = (*p_iout_file).tilecoordinates(*trait, *snp);
+			pos = (*p_iout_file).tilecoordinates(*trait, *snp);
 			//cout << oldPos << "-" << pos << endl;
 			if(pos != oldPos)
 			{
@@ -199,12 +201,13 @@ void Reshuffle::write_slim_data(ifstream& out_file, ofstream& txt_slim){
 	txt_slim << "Chi2" << endl;
 	for (set<int>::iterator trait= goodtraits.begin();trait!=goodtraits.end();trait++) {
 		double* buf = new double[per_trait_per_snp];
-		int oldPos = 0;
+		int64_t oldPos = 0;
 		char s[30];
+		int64_t pos = 0;
 		for (set<int>::iterator snp= goodsnps.begin();snp!=goodsnps.end();snp++) {
 			txt_slim << (*(*p_iout_file).labels.snp_names)[*snp] << "\t";
 			txt_slim << (*(*p_iout_file).labels.trait_names)[*trait]<<"\t";
-			int pos = (*p_iout_file).tilecoordinates(*trait, *snp);
+			pos = (*p_iout_file).tilecoordinates(*trait, *snp);
 			//cout << oldPos << "-" << pos << endl;
 			if(pos != oldPos)
 			{

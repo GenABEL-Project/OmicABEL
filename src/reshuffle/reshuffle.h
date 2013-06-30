@@ -28,7 +28,7 @@ public:
 	void write_data_chi(ifstream&,ofstream&);
 	void write_slim_data(ifstream&,ofstream&);
 	void write_herest(ifstream&,ofstream&);
-	int herest_startpos;
+	int64_t herest_startpos;
 	int est_shift(int);
 	int est_beta_shift(int);
 	void run(Parameters);
