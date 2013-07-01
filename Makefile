@@ -2,8 +2,10 @@ include ./make.inc
 
 SRCDIR = ./src
 RESH_SRCDIR = ./src/reshuffle
+F2D_SRCDIR  = ./src/float2double
 CLAKGWAS  = ./bin/CLAK-GWAS
 RESHUFFLE = ./bin/reshuffle
+F2D       = ./bin/float2double
 
 #QUICK and DIRTY
 CXX=g++
@@ -15,11 +17,13 @@ LDLIBS += -lm
 SRCS = $(SRCDIR)/CLAK_GWAS.c $(SRCDIR)/fgls_chol.c $(SRCDIR)/fgls_eigen.c $(SRCDIR)/wrappers.c $(SRCDIR)/timing.c $(SRCDIR)/statistics.c $(SRCDIR)/REML.c $(SRCDIR)/optimization.c $(SRCDIR)/ooc_BLAS.c $(SRCDIR)/double_buffering.c $(SRCDIR)/utils.c $(SRCDIR)/GWAS.c $(SRCDIR)/databel.c 
 OBJS = $(SRCS:.c=.o)
 RESH_SRCS=$(RESH_SRCDIR)/main.cpp $(RESH_SRCDIR)/iout_file.cpp $(RESH_SRCDIR)/Parameters.cpp $(RESH_SRCDIR)/reshuffle.cpp $(RESH_SRCDIR)/test.cpp
-RESH_OBJS = $(RESH_SRCS:.cpp=.o)
+RESH_OBJS=$(RESH_SRCS:.cpp=.o)
+F2D_SRCS=$(F2D_SRCDIR)/float2double.c
+F2D_OBJS=$(F2D_SRCS:.c=.o) $(SRCDIR)/databel.o $(SRCDIR)/wrappers.o
 
 .PHONY: all clean
 
-all: ./bin/ $(CLAKGWAS) $(RESHUFFLE) 
+all: ./bin/ $(CLAKGWAS) $(RESHUFFLE) $(F2D)
 
 ./bin:
 	mkdir bin
@@ -31,15 +35,19 @@ $(RESHUFFLE): $(RESH_OBJS)
 	cd $(RESH_SRCDIR)
 	$(CXX) $^ -o $@
 
+$(F2D): $(F2D_OBJS)
+	cd $(F2D_SRCDIR)
+	$(CC) $^ -o $@
+
 # Dirty, improve
 platform=Linux
 bindistDir=OmicABEL-$(platform)-bin
-bindist: ./bin/ $(CLAKGWAS) $(RESHUFFLE)
+bindist: ./bin/ $(CLAKGWAS) $(RESHUFFLE) $(F2D)
 	rm -rf $(bindistDir)
 	mkdir $(bindistDir)
 	mkdir $(bindistDir)/bin/
 	mkdir $(bindistDir)/doc/
-	cp -a $(CLAKGWAS) $(RESHUFFLE) $(bindistDir)/bin/
+	cp -a $(CLAKGWAS) $(RESHUFFLE) $(F2D) $(bindistDir)/bin/
 	cp -a COPYING LICENSE README DISCLAIMER.$(platform) $(bindistDir)
 	cp -a doc/README-reshuffle doc/INSTALL doc/HOWTO $(bindistDir)/doc
 	tar -czvf $(bindistDir).tgz $(bindistDir)
@@ -52,6 +60,8 @@ clean:
 	$(RM) $(SRCDIR)/*opari_GPU*
 	$(RM) $(RESH_OBJS)
 	$(RM) $(RESHUFFLE)
+	$(RM) $(F2D_OBJS)
+	$(RM) $(F2D)
 
 
 src/CLAK_GWAS.o: src/CLAK_GWAS.c src/wrappers.h src/utils.h src/GWAS.h \

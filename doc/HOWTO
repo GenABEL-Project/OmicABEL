@@ -5,6 +5,9 @@ In the directory bin/, you find the following executables:
 
 * CLAK-GWAS: the program to run GWAS analyses (through CLAK-Chol or CLAK-Eig)
 * reshuffle: the program to extract the output of CLAK-GWAS into text format
+* float2double: the program to translate databel files (*.fvi, *.fvd) 
+                in single precision "float" format into double precision 
+                "double" format.
 
 The output produced by CLAK-GWAS is kept in a compact binary format
 for performance reasons. The user can then use "reshuffle" to
@@ -20,6 +23,10 @@ Currently, as input CLAK-GWAS only accepts data files in the DatABEL
 filevector are given in the tutorial available at
 
 http://www.genabel.org/packages/OmicABEL
+
+If you already prepared your data in DatABEL format, but you used
+single precision (float) data. You can make use of float2double
+to transform it into double precision (double) data.
 
 If you need help, please contact us, or use the GenABEL project forum
 
@@ -40,7 +47,7 @@ available through the command
 
 The example in the tutorial also provides a basic example on using OmicABEL
 to run your GWAS analyses. Here we detail the options of CLAK-GWAS. 
-The complete list of options for CLAK-GWAS is avaliable through the command
+The complete list of options for CLAK-GWAS is available through the command
 
 ./CLAK-GWAS -h
 
@@ -84,3 +91,5 @@ Following options might be given:
 
 
 For a detailed description of "reshuffle", please refer to doc/README-reshuffle
+
+
