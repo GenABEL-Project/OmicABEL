@@ -321,12 +321,13 @@ void print_timestamp( void )
 	printf( "%lld:%lld seconds\n", (long long)t.tv_sec, (long long)t.tv_usec );
 }
 
-void average( double *data, int n, int ncols, int threshold, const char *obj_type, char *obj_name, int namelength, int verbose )
+void average( double *data, int n, int ncols, int threshold, const char *obj_type, char *obj_name, int namelength, int verbose, int nths )
 {
 	int i, j;
 	double sum, avg;
 	int nans, infs;
 
+	#pragma omp parallel for private(j, sum, nans, infs, i, avg) schedule(static, 4) num_threads(nths)
 	for ( j = 0; j < ncols; j++ )
 	{
 		sum = 0.0;
