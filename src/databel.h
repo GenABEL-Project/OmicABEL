@@ -25,14 +25,14 @@
 #ifndef DATABEL_H
 #define DATABEL_H
 
-#define UNSIGNED_SHORT_INT_TYPE
-#define SHORT_INT_TYPE
-#define UNSIGNED_INT_TYPE
-#define INT_TYPE
-#define FLOAT_TYPE
-#define DOUBLE_TYPE
-#define SIGNED_CHAR_TYPE
-#define UNSIGNED_CHAR_TYPE
+enum datatype{ UNSIGNED_SHORT_INT_TYPE = 1,
+               SHORT_INT_TYPE,
+               UNSIGNED_INT_TYPE,
+               INT_TYPE,
+               FLOAT_TYPE,
+               DOUBLE_TYPE,
+               SIGNED_CHAR_TYPE,
+               UNSIGNED_CHAR_TYPE };
 
 #define NAMELENGTH 32
 #define RESERVEDSPACE 5
