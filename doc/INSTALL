@@ -20,11 +20,11 @@
   for the compilation. The directory inc/ contains several versions of
   make.inc, customized for different combinations of architectures, 
   compilers, and libraries. Choose the most suitable one for you, and 
-  overwrite the file make.inc with it. For instance, if you chose to 
+  overwrite the file make.inc with it. For instance, if you choose to 
   install the BLAS and LAPACK libraries linked above in a linux 
   machine, select the file "make.inc.gnu-goto". You will need to set 
   the paths to the aforementioned libraries in your system.
   
   Once the make.inc file is ready, you can compile the code. Simply 
-  type "make" and it will create the binaries "CLAK-GWAS" and 
-  "reshuffle" in the bin/ directory.
+  type "make" and it will create the binaries "CLAK-GWAS", "reshuffle",
+  and "float2double" in the bin/ directory.
