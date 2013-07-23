@@ -2,6 +2,7 @@ ver 0.001
 	improved parsing of command line:
 		search for parameter's name only after separator
 		delete parameter's name and value from command line in case of finding it
+		
 ver 0.002
 	tests for all points in specification
 		one bug with traitsbynames test unfixed
@@ -31,6 +32,7 @@ ver 0.005
 	output corrected
 		in data/chi_data/slim_data column names are 
 			SNP TRAIT ... ... ... (Chi) 
+			
 ver 0.006
 	default output
 		if there are no input parameters(only file's path) output is whole data 

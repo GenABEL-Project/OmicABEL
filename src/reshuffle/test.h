@@ -7,6 +7,10 @@
 
 #ifndef TEST_H_
 #define TEST_H_
+
+typedef long long int64_t;
+
+
 #include "Parameters.h"
 #include "iout_file.h"
 #include "reshuffle.h"
@@ -20,7 +24,7 @@ public:
 	string check;
 	Parameters *Params_test;//&Paramss;
 	test(string,string,string,string);
-	void run();
+	void run(ofstream&);
 };
 #endif
 /* TEST_H_ */

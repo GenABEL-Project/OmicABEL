@@ -10,7 +10,7 @@
 
 using namespace std;
 
-ofstream test_txt("test.txt");
+
 test::test(string Name,string cmd,string Result,string Check){
 	Params_test= new Parameters;
 	name=Name;
@@ -47,7 +47,8 @@ test::test(string Name,string cmd,string Result,string Check){
 	}
 }
 
-void test::run(){
+void test::run(ofstream& test_txt){
+	test_txt.open ("test.txt", fstream::app);
 	test_txt<<"START TEST "<<name<<"\t";
 	iout_file iout_F(*Params_test);
 	if(Params_test->traits.use)
@@ -74,7 +75,7 @@ void test::run(){
 		test_txt<<"Test "<<name<<" FAILED!!!"<<endl;
 	}else
 		test_txt<<"Test "<<name<<" OK"<<endl;
-
+	test_txt.close();
 	//TODO: remove doesn't work from test.cpp
 	/*if(remove(result.c_strf()) != 0 )
 	  cout<<"Error deleting file";*/
