@@ -76,6 +76,8 @@ ostream &operator <<(ostream &os,labels_data labels) {
 	os <<"NUMBER OF COVS\t"<<(*labels.cov).size()<<endl;
 	os <<"NUMBER OF SNPNAMES\t"<<(*labels.snp_names).size()<<endl;
 	os <<"NUMBER OF TRAITNAMES\t"<<(*labels.trait_names).size()<<endl;
+
+	return os;
 }
 
 int64_t iout_file::tilecoordinates(int traitNo, int snpNo) {
