@@ -8,8 +8,6 @@
 #ifndef PARAMETERS_H_
 #define PARAMETERS_H_
 
-typedef long long int64_t;
-
 #include <iostream>
 #include <string>
 #include <set>

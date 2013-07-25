@@ -8,15 +8,12 @@
 #ifndef IOUT_FILE_H_
 #define IOUT_FILE_H_
 
-typedef long long int64_t;
-
 #include <fstream>
 #include <iostream>
 #include <vector>
 #include "Parameters.h"
 #include <stdlib.h>
 #include <stdio.h>
-
 
 using namespace std;
 

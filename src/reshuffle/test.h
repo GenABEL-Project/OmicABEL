@@ -8,14 +8,10 @@
 #ifndef TEST_H_
 #define TEST_H_
 
-typedef long long int64_t;
-
-
 #include "Parameters.h"
 #include "iout_file.h"
 #include "reshuffle.h"
 //#include <dir.h>
-using namespace std;
 
 class test{
 public:

@@ -11,6 +11,8 @@
 #include <math.h>
 #include <iterator>
 #include <list>
+#include <sstream>
+#include <string>
 
 using namespace std;
 
@@ -81,12 +83,14 @@ void Reshuffle::write_data(ifstream& out_file,ofstream& data){
 	data << endl;
 	double* buf = new double[per_trait_per_snp];
 	char s[30];
+	ostringstream ostr;
 	for (set<int>::iterator trait= (*p_Parameters).traits.numbersset.begin();trait!=(*p_Parameters).traits.numbersset.end();trait++) {
 		int64_t oldPos = 0;
 		int64_t pos;
+		//TODO: 2 previous lines to ONE
 		for (set<int>::iterator snp= (*p_Parameters).snps.numbersset.begin();snp!=(*p_Parameters).snps.numbersset.end();snp++) {
-			data << (*(*p_iout_file).labels.snp_names)[*snp] << "\t";
-			data << (*(*p_iout_file).labels.trait_names)[*trait]<<"\t";
+			ostr << (*(*p_iout_file).labels.snp_names)[*snp] << "\t";
+			ostr << (*(*p_iout_file).labels.trait_names)[*trait]<<"\t";
 			pos = (*p_iout_file).tilecoordinates(*trait, *snp);
 			//cout << oldPos << "-" << pos << endl;
 			if(pos != oldPos)
@@ -97,10 +101,13 @@ void Reshuffle::write_data(ifstream& out_file,ofstream& data){
 			out_file.read((char *)buf, sizeof(double)*per_trait_per_snp);
 			for (int i = 0; i < per_trait_per_snp; i++) {
 				sprintf(s, "%.15g", buf[i]);
-				data << s << "\t";
+				ostr << s << "\t";
 			}
-			data << endl;
+			ostr << endl;
 		}
+		data << ostr.str();
+		ostr.str("");
+		ostr.clear();
 
 		//txt_trait.close();
 		//cout << "End_write_trait\t" << (*(*p_iout_file).labels.trait_names)[*trait] << " "<< double(clock()) / CLOCKS_PER_SEC <<" sec" << endl;
@@ -126,10 +133,12 @@ void Reshuffle::write_data_chi(ifstream& out_file,ofstream& txt_chi){
 	txt_chi << "Chi2" << endl;
 	double* buf = new double[per_trait_per_snp];
 	char s[30];
+	ostringstream ostr;
 	for (set<int>::iterator trait= (*p_Parameters).traits.numbersset.begin();trait!=(*p_Parameters).traits.numbersset.end();trait++) {
 		//ofstream txt_chi(create_filename("chi_data//chi", (*(*p_iout_file).labels.trait_names)[*trait]).c_str());
 		int64_t oldPos = 0;
 		int64_t pos = 0;
+		//TODO: 2 previous lines to ONE
 		for (set<int>::iterator snp= (*p_Parameters).snps.numbersset.begin();snp!=(*p_Parameters).snps.numbersset.end();snp++) {
 			pos = (*p_iout_file).tilecoordinates(*trait, *snp);
 			//cout << oldPos << "-" << pos << endl;
@@ -141,15 +150,18 @@ void Reshuffle::write_data_chi(ifstream& out_file,ofstream& txt_chi){
 			out_file.read((char *)buf, sizeof(double)*per_trait_per_snp);
 			chi=pow((buf[(*(*p_iout_file).labels.beta).size()-1]/buf[(*(*p_iout_file).labels.beta).size()+(*(*p_iout_file).labels.se).size()-1]),2);
 			if(chi>CheckChi){
-				txt_chi << (*(*p_iout_file).labels.snp_names)[*snp] << "\t";
-				txt_chi << (*(*p_iout_file).labels.trait_names)[*trait]<<"\t";
+				ostr << (*(*p_iout_file).labels.snp_names)[*snp] << "\t";
+				ostr << (*(*p_iout_file).labels.trait_names)[*trait]<<"\t";
 				for (int i = 0; i < per_trait_per_snp; i++) {
 					sprintf(s, "%.15g", buf[i]);
-					txt_chi << s << "\t";
+					ostr << s << "\t";
 				}
-				txt_chi << chi << endl;
+				ostr << chi << endl;
 			}
 		}
+		txt_chi << ostr.str();
+		ostr.str("");
+		ostr.clear();
 
 		//txt_chi.close();
 		//cout << "End_write_chi_trait\t" << (*(*p_iout_file).labels.trait_names)[*trait] << " "<< double(clock()) / CLOCKS_PER_SEC <<" sec" << endl;
@@ -169,10 +181,11 @@ void Reshuffle::write_slim_data(ifstream& out_file, ofstream& txt_slim){
 		exit(1);
 	}
 	double CheckChi = atof((*p_Parameters).chi.value.c_str());
+	double* buf = new double[per_trait_per_snp];
 	for (set<int>::iterator trait= (*p_Parameters).traits.numbersset.begin();trait!=(*p_Parameters).traits.numbersset.end();trait++) {
-		double* buf = new double[per_trait_per_snp];
 		int64_t oldPos = 0;
 		int64_t pos = 0;
+		//TODO: 2 previous lines to ONE
 		//char s[30];
 		for (set<int>::iterator snp= (*p_Parameters).snps.numbersset.begin();snp!=(*p_Parameters).snps.numbersset.end();snp++) {
 			pos = (*p_iout_file).tilecoordinates(*trait, *snp);
@@ -201,11 +214,12 @@ void Reshuffle::write_slim_data(ifstream& out_file, ofstream& txt_slim){
 	for (unsigned int cov = 0;cov < (*(*p_iout_file).labels.cov).size(); cov++)
 		txt_slim << (*(*p_iout_file).labels.cov)[cov] << "\t";
 	txt_slim << "Chi2" << endl;
+	ostringstream ostr;
 	for (set<int>::iterator trait= goodtraits.begin();trait!=goodtraits.end();trait++) {
-		double* buf = new double[per_trait_per_snp];
 		int64_t oldPos = 0;
-		char s[30];
 		int64_t pos = 0;
+		//TODO: 2 previous lines to ONE
+		char s[30];
 		for (set<int>::iterator snp= goodsnps.begin();snp!=goodsnps.end();snp++) {
 			txt_slim << (*(*p_iout_file).labels.snp_names)[*snp] << "\t";
 			txt_slim << (*(*p_iout_file).labels.trait_names)[*trait]<<"\t";
@@ -220,10 +234,13 @@ void Reshuffle::write_slim_data(ifstream& out_file, ofstream& txt_slim){
 			chi=pow((buf[(*(*p_iout_file).labels.beta).size()-1]/buf[(*(*p_iout_file).labels.beta).size()+(*(*p_iout_file).labels.se).size()-1]),2);
 			for (int i = 0; i < per_trait_per_snp; i++) {
 				sprintf(s, "%.15g", buf[i]);
-				txt_slim << s << "\t";
+				ostr << s << "\t";
 			}
-			txt_slim << chi << endl;
+			ostr << chi << endl;
 		}
+		txt_slim << ostr.str();
+		ostr.str("");
+		ostr.clear();
 		delete buf;
 	}
 	cout <<"End_write_slim_data\t" << double(clock()) / CLOCKS_PER_SEC <<" sec" << endl;
@@ -241,6 +258,7 @@ int Reshuffle::est_beta_shift(int counter){
 	return shift;
 }
 
+//TODO: check heritability estimates
 void Reshuffle::write_herest(ifstream& out_file, ofstream& herest){
 	ofstream txt_est("estimates.txt");
 	out_file.seekg(herest_startpos, ios_base::beg);

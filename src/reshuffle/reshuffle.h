@@ -8,13 +8,11 @@
 #ifndef RESHUFFLE_H_
 #define RESHUFFLE_H_
 
-typedef long long int64_t;
-
 #include "Parameters.h"
 #include "iout_file.h"
 
 using namespace std;
-typedef long long int64_t;
+
 class Reshuffle{
 public:
 	iout_file * p_iout_file;
