@@ -146,7 +146,7 @@ Parameters::Parameters(int argc,char* argv[]) {
 	help = Parameter(cmdline,"help","");
 	info = Parameter(cmdline, "info","");
 	cmdline=info.delfromcmdline(cmdline);
-	datadims = Parameter(cmdline, "datadims","datdims.txt");
+	datadims = Parameter(cmdline, "datadims","datadims.txt");
 	cmdline=datadims.delfromcmdline(cmdline);
 	snpnames = Parameter(cmdline, "snpnames","snpnames.txt");
 	cmdline=snpnames.delfromcmdline(cmdline);

@@ -21,7 +21,7 @@ Reshuffle::Reshuffle(iout_file &iout,Parameters &Params){
 	p_iout_file = &iout;
 	p_Parameters = &Params;
 	per_trait_per_snp = (*p_iout_file).header.p + (*p_iout_file).header.p * ((*p_iout_file).header.p + 1) / 2;
-	herest_startpos = (p_iout_file->header.m * p_iout_file->header.t*
+	herest_startpos = (long long)(p_iout_file->header.m * p_iout_file->header.t*
 			(p_iout_file->header.p + p_iout_file->header.p * (p_iout_file->header.p + 1) / 2))
 					* sizeof(double);
 }
@@ -84,9 +84,7 @@ void Reshuffle::write_data(ifstream& out_file,ofstream& data){
 	char s[30];
 	ostringstream ostr;
 	for (set<int>::iterator trait= (*p_Parameters).traits.numbersset.begin();trait!=(*p_Parameters).traits.numbersset.end();trait++) {
-		long long oldPos = 0;
-		long long pos;
-		//TODO: 2 previous lines to ONE
+		long long oldPos=0,pos = 0;
 		for (set<int>::iterator snp= (*p_Parameters).snps.numbersset.begin();snp!=(*p_Parameters).snps.numbersset.end();snp++) {
 			ostr << (*(*p_iout_file).labels.snp_names)[*snp] << "\t";
 			ostr << (*(*p_iout_file).labels.trait_names)[*trait]<<"\t";
@@ -135,9 +133,7 @@ void Reshuffle::write_data_chi(ifstream& out_file,ofstream& txt_chi){
 	ostringstream ostr;
 	for (set<int>::iterator trait= (*p_Parameters).traits.numbersset.begin();trait!=(*p_Parameters).traits.numbersset.end();trait++) {
 		//ofstream txt_chi(create_filename("chi_data//chi", (*(*p_iout_file).labels.trait_names)[*trait]).c_str());
-		long long oldPos = 0;
-		long long pos = 0;
-		//TODO: 2 previous lines to ONE
+		long long oldPos=0,pos = 0;
 		for (set<int>::iterator snp= (*p_Parameters).snps.numbersset.begin();snp!=(*p_Parameters).snps.numbersset.end();snp++) {
 			pos = (*p_iout_file).tilecoordinates(*trait, *snp);
 			//cout << oldPos << "-" << pos << endl;
@@ -182,10 +178,7 @@ void Reshuffle::write_slim_data(ifstream& out_file, ofstream& txt_slim){
 	double CheckChi = atof((*p_Parameters).chi.value.c_str());
 	double* buf = new double[per_trait_per_snp];
 	for (set<int>::iterator trait= (*p_Parameters).traits.numbersset.begin();trait!=(*p_Parameters).traits.numbersset.end();trait++) {
-		long long oldPos = 0;
-		long long pos = 0;
-		//TODO: 2 previous lines to ONE
-		//char s[30];
+		long long oldPos=0,pos = 0;
 		for (set<int>::iterator snp= (*p_Parameters).snps.numbersset.begin();snp!=(*p_Parameters).snps.numbersset.end();snp++) {
 			pos = (*p_iout_file).tilecoordinates(*trait, *snp);
 			//cout << oldPos << "-" << pos << endl;
@@ -201,29 +194,26 @@ void Reshuffle::write_slim_data(ifstream& out_file, ofstream& txt_slim){
 				goodsnps.insert(*snp);
 			}
 		}
-		delete buf;
 	}
-	out_file.seekg(0, ios_base::beg);
-	txt_slim << "SNP\t";
-	txt_slim << "Trait\t";
-	for (unsigned int beta = 0;	beta < (*(*p_iout_file).labels.beta).size(); beta++)
-		txt_slim << (*(*p_iout_file).labels.beta)[beta] << "\t";
-	for (unsigned int se = 0;se < (*(*p_iout_file).labels.se).size(); se++)
-		txt_slim << (*(*p_iout_file).labels.se)[se] << "\t";
-	for (unsigned int cov = 0;cov < (*(*p_iout_file).labels.cov).size(); cov++)
-		txt_slim << (*(*p_iout_file).labels.cov)[cov] << "\t";
-	txt_slim << "Chi2" << endl;
 	ostringstream ostr;
+	out_file.seekg(0, ios_base::beg);
+	ostr << "SNP\t";
+	ostr << "Trait\t";
+	for (unsigned int beta = 0;	beta < (*(*p_iout_file).labels.beta).size(); beta++)
+		ostr << (*(*p_iout_file).labels.beta)[beta] << "\t";
+	for (unsigned int se = 0;se < (*(*p_iout_file).labels.se).size(); se++)
+		ostr << (*(*p_iout_file).labels.se)[se] << "\t";
+	for (unsigned int cov = 0;cov < (*(*p_iout_file).labels.cov).size(); cov++)
+		ostr << (*(*p_iout_file).labels.cov)[cov] << "\t";
+	ostr << "Chi2" << endl;
+
+	char s[30];
 	for (set<int>::iterator trait= goodtraits.begin();trait!=goodtraits.end();trait++) {
-		long long oldPos = 0;
-		long long pos = 0;
-		//TODO: 2 previous lines to ONE
-		char s[30];
+		long long oldPos=0,pos = 0;
 		for (set<int>::iterator snp= goodsnps.begin();snp!=goodsnps.end();snp++) {
-			txt_slim << (*(*p_iout_file).labels.snp_names)[*snp] << "\t";
-			txt_slim << (*(*p_iout_file).labels.trait_names)[*trait]<<"\t";
+			ostr << (*(*p_iout_file).labels.snp_names)[*snp] << "\t";
+			ostr << (*(*p_iout_file).labels.trait_names)[*trait]<<"\t";
 			pos = (*p_iout_file).tilecoordinates(*trait, *snp);
-			//cout << oldPos << "-" << pos << endl;
 			if(pos != oldPos)
 			{
 				out_file.seekg(pos,ios_base::beg);
@@ -240,8 +230,8 @@ void Reshuffle::write_slim_data(ifstream& out_file, ofstream& txt_slim){
 		txt_slim << ostr.str();
 		ostr.str("");
 		ostr.clear();
-		delete buf;
 	}
+	delete buf;
 	cout <<"End_write_slim_data\t" << double(clock()) / CLOCKS_PER_SEC <<" sec" << endl;
 }
 
@@ -257,7 +247,6 @@ int Reshuffle::est_beta_shift(int counter){
 	return shift;
 }
 
-//TODO: check heritability estimates
 void Reshuffle::write_herest(ifstream& out_file, ofstream& herest){
 	ofstream txt_est("estimates.txt");
 	out_file.seekg(herest_startpos, ios_base::beg);
@@ -322,7 +311,6 @@ void Reshuffle::run(){
 	if((*p_Parameters).traitnames.use){
 		ofstream traitnames((*p_Parameters).traitnames.outfile.c_str());
 		write_traitnames(traitnames);
-		//delete traitnames;
 	}
 
 	//Open *.out to read data
