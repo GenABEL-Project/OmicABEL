@@ -270,9 +270,9 @@ void Reshuffle::write_herest(ifstream& out_file, ofstream& herest){
 		txt_est << (*(p_iout_file->labels.trait_names))[*trait] << "\t";
 	txt_est << endl;
 	list<string> est_names;
-	est_names.insert(est_names.end(), "heritabilities");
-	est_names.insert(est_names.end(), "sigma");
-	est_names.insert(est_names.end(), "res_sigma");
+	est_names.insert(est_names.end(), "h2");
+	est_names.insert(est_names.end(), "var");
+	est_names.insert(est_names.end(), "resVar");
 	double tmp_number = 0;
 	int counter=0;
 	for (list<string>::iterator name = est_names.begin();name != est_names.end(); ++name) {

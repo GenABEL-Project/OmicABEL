@@ -16,7 +16,7 @@ using namespace std;
 int main(int argc, char* argv[]) {
 	//cout<<"Start reshuffeling"<<endl;
 	Parameters Params(argc, argv);
-	if((Params.h.use||Params.help.use||(Params.iout_fname==".iout"&&Params.out_fname==".out"))&&(!Params.test.use)){
+	if((Params.help.use||(Params.iout_fname==".iout"&&Params.out_fname==".out"))&&(!Params.test.use)){
 		cout<<"Available commands"<<endl<<endl;
 		cout<<" --datadims | to get data's dimension"<<endl<<endl;
 		cout<<" --snpnames=<indexes> | to get names of SNP by indexes"<<endl<<endl;

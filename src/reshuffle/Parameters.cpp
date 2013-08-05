@@ -142,7 +142,7 @@ Parameters::Parameters(int argc,char* argv[]) {
 	cmdline.erase(0,seppos);//Erase file name
 	iout_fname = filename + ".iout";
 	out_fname = filename + ".out";
-	h = Parameter(cmdline,"h","");
+	//h = Parameter(cmdline,"h","");
 	help = Parameter(cmdline,"help","");
 	info = Parameter(cmdline, "info","");
 	cmdline=info.delfromcmdline(cmdline);
