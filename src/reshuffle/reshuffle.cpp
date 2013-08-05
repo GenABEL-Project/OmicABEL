@@ -6,7 +6,6 @@
  */
 
 #include "reshuffle.h"
-//#include <dir.h>
 #include <ctime>
 #include <math.h>
 #include <iterator>
@@ -85,8 +84,8 @@ void Reshuffle::write_data(ifstream& out_file,ofstream& data){
 	char s[30];
 	ostringstream ostr;
 	for (set<int>::iterator trait= (*p_Parameters).traits.numbersset.begin();trait!=(*p_Parameters).traits.numbersset.end();trait++) {
-		int64_t oldPos = 0;
-		int64_t pos;
+		long long oldPos = 0;
+		long long pos;
 		//TODO: 2 previous lines to ONE
 		for (set<int>::iterator snp= (*p_Parameters).snps.numbersset.begin();snp!=(*p_Parameters).snps.numbersset.end();snp++) {
 			ostr << (*(*p_iout_file).labels.snp_names)[*snp] << "\t";
@@ -136,8 +135,8 @@ void Reshuffle::write_data_chi(ifstream& out_file,ofstream& txt_chi){
 	ostringstream ostr;
 	for (set<int>::iterator trait= (*p_Parameters).traits.numbersset.begin();trait!=(*p_Parameters).traits.numbersset.end();trait++) {
 		//ofstream txt_chi(create_filename("chi_data//chi", (*(*p_iout_file).labels.trait_names)[*trait]).c_str());
-		int64_t oldPos = 0;
-		int64_t pos = 0;
+		long long oldPos = 0;
+		long long pos = 0;
 		//TODO: 2 previous lines to ONE
 		for (set<int>::iterator snp= (*p_Parameters).snps.numbersset.begin();snp!=(*p_Parameters).snps.numbersset.end();snp++) {
 			pos = (*p_iout_file).tilecoordinates(*trait, *snp);
@@ -183,8 +182,8 @@ void Reshuffle::write_slim_data(ifstream& out_file, ofstream& txt_slim){
 	double CheckChi = atof((*p_Parameters).chi.value.c_str());
 	double* buf = new double[per_trait_per_snp];
 	for (set<int>::iterator trait= (*p_Parameters).traits.numbersset.begin();trait!=(*p_Parameters).traits.numbersset.end();trait++) {
-		int64_t oldPos = 0;
-		int64_t pos = 0;
+		long long oldPos = 0;
+		long long pos = 0;
 		//TODO: 2 previous lines to ONE
 		//char s[30];
 		for (set<int>::iterator snp= (*p_Parameters).snps.numbersset.begin();snp!=(*p_Parameters).snps.numbersset.end();snp++) {
@@ -216,8 +215,8 @@ void Reshuffle::write_slim_data(ifstream& out_file, ofstream& txt_slim){
 	txt_slim << "Chi2" << endl;
 	ostringstream ostr;
 	for (set<int>::iterator trait= goodtraits.begin();trait!=goodtraits.end();trait++) {
-		int64_t oldPos = 0;
-		int64_t pos = 0;
+		long long oldPos = 0;
+		long long pos = 0;
 		//TODO: 2 previous lines to ONE
 		char s[30];
 		for (set<int>::iterator snp= goodsnps.begin();snp!=goodsnps.end();snp++) {

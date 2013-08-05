@@ -52,6 +52,6 @@ public:
 	iout_header header;
 	labels_data labels;
 	iout_file(Parameters &);
-	int64_t tilecoordinates(int, int);
+	long long tilecoordinates(int, int);
 };
 #endif /* IOUT_FILE_H_ */

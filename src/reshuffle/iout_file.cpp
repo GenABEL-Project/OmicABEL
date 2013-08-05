@@ -80,8 +80,8 @@ ostream &operator <<(ostream &os,labels_data labels) {
 	return os;
 }
 
-int64_t iout_file::tilecoordinates(int traitNo, int snpNo) {
-	int64_t tileCoor = 0;
+long long iout_file::tilecoordinates(int traitNo, int snpNo) {
+	long long tileCoor = 0;
 	int t_tile = traitNo / header.tile_t;
 	int t_off = traitNo % header.tile_t;
 	int m_tile = snpNo / header.tile_m;
@@ -91,13 +91,13 @@ int64_t iout_file::tilecoordinates(int traitNo, int snpNo) {
 
 	//cout <<t_tile<<endl<<t_off<<endl<<m_tile<<endl<<m_off<<endl<<endl;
 	//cout<<(tileCoor)<<endl;
-	tileCoor = (int64_t)t_tile * header.m * header.tile_t;
+	tileCoor = (long long)t_tile * header.m * header.tile_t;
 	//cout<<(tileCoor)<<endl;
-	tileCoor += (int64_t)m_tile * header.tile_m * min(header.tile_t,header.t - header.tile_t * t_tile);
+	tileCoor += (long long)m_tile * header.tile_m * min(header.tile_t,header.t - header.tile_t * t_tile);
 	//cout<<(tileCoor)<<endl;
-	tileCoor += (int64_t)t_off * min(header.tile_m, header.m - header.tile_m * m_tile)+ m_off;
+	tileCoor += (long long)t_off * min(header.tile_m, header.m - header.tile_m * m_tile)+ m_off;
 	//cout<<(tileCoor)<<endl;
-	tileCoor *= (int64_t)per_trait_per_snp * sizeof(double);
+	tileCoor *= (long long)per_trait_per_snp * sizeof(double);
 	//cout<<(tileCoor)<<endl;
 	return tileCoor;
 }
