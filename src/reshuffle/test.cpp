@@ -18,7 +18,7 @@ test::test(string Name,string cmd,string Result,string Check){
 	check=Check;
 	Params_test->iout_fname="data_4test/4test.iout";
 	Params_test->out_fname="data_4test/4test.out";
-	if(name=="datadims")
+	/*if(name=="datadims")
 		Params_test->datadims = Parameter(cmd,"datadims","datadims.txt");
 	if(name=="traitnamesdef"||name=="traitnames")
 		Params_test->traitnames = Parameter(cmd,"traitnames","traitnames.txt");
@@ -44,11 +44,11 @@ test::test(string Name,string cmd,string Result,string Check){
 	if(name=="dataslim"){
 		Params_test->dataslim = Parameter(cmd,"dataslim","slim_data.txt");
 		Params_test->chi = Parameter(cmd,"chi","chi_data.txt");
-	}
+	}*/
 }
 
 void test::run(ofstream& test_txt){
-	test_txt.open ("test.txt", fstream::app);
+	test_txt.open ("testd.txt", fstream::app);
 	test_txt<<"START TEST "<<name<<"\t";
 	iout_file iout_F(*Params_test);
 	if(Params_test->traits.use)

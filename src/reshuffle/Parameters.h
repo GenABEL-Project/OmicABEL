@@ -12,14 +12,17 @@
 #include <string>
 #include <set>
 #include <vector>
+#include <getopt.h>
+#include <stdlib.h>
+
 using namespace std;
 
 class Parameter {
 
 public:
-	string name; 	//name of parametr
-	bool use; 	// Parameter use or not (Is paameter in command line?)
-	string value; 	// value of parametr,chars after "=" symbol
+	string name; 	//name of parameter
+	bool use; 	// Parameter use or not (Is parameter in command line?)
+	string value; 	// value of parameter,chars after "=" symbol
 	set<int> numbersset;
 	set<string> namesset;
 	string delfromcmdline(string);
@@ -33,20 +36,21 @@ ostream &operator <<(ostream &, Parameter);
 
 class Parameters {
 public:
-	string iout_fname; //iout_file_name
-	string out_fname;
-	//Parameter h; //Print help
-	Parameter help; //Print help
-	Parameter info; // Write info about progeamm's run
-	Parameter datadims;
+	string iout_fname; // OmicABEL iout_file_name
+	string out_fname; // OmicABEL out_file_name
+	string outfile; // out_file path
+	bool default_outfile; // use default out_file_name
+	bool get_help; //Print help
+	bool get_info; // Write info about programm's run
+	bool run_test;
+	bool write_datadims;
+	bool write_slim_data;
 	Parameter snpnames;
 	Parameter traitnames;
 	Parameter traits;
 	Parameter snps;
 	Parameter heritabilities;
 	Parameter chi;
-	Parameter dataslim;
-	Parameter test;
 	Parameters();
 	Parameters(int, char*[]);		//	Constructor from cmdline
 	static string get_cmd_line(int,char*[]);

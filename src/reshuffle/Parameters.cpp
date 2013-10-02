@@ -5,8 +5,7 @@
  *      Author: Sodbo
  */
 #include "Parameters.h"
-#include <stdlib.h>
-#include <string>
+
 using namespace std;
 
 string sep = "--"; // Set separator for cmdline
@@ -17,7 +16,6 @@ string Parameters::get_cmd_line(int argc, char* argv[]) {
 	for (int i = 1; i < argc; i++) {
 		cmd_line += argv[i];
 	}
-	cout<<cmd_line<<endl;
 	cmd_line += sep; // Need for cmdline parsing
 	return cmd_line;
 }
@@ -38,23 +36,30 @@ ostream &operator <<(ostream &os, Parameter par) {
 	cout<<"\tNames set ";
 	for (set<string>::iterator it= par.namesset.begin();it!=par.namesset.end();it++)
 		os <<*it<<" ";
-	os<<"\toutfile="<<par.outfile;
+	//os<<"\toutfile="<<par.outfile;
 	os<<endl;
 	return os;
 }
 
 //Overloading operator cout for class Parameters
 ostream &operator <<(ostream &os, Parameters par) {
-	os << "IOUT file is "<<par.iout_fname<<endl;
-	os << "OUT file is "<<par.out_fname<<endl;
-	os << par.datadims;
+	os << "OmicABEL iout_file is "<<par.iout_fname<<endl;
+	os << "OmicABEL out_file is "<<par.out_fname<<endl;
+	if (par.default_outfile){
+		os << "Using default out file name"<<endl;
+	}else
+		os << "Out file name : "<<par.outfile<<endl;
+
+	os << "Print help : " << par.get_help<<endl;
+	os << "Print info : " << par.get_info<<endl;
+	os << "Write data dimension : " << par.write_datadims<<endl;
 	os << par.snpnames;
 	os << par.traitnames;
 	os << par.traits;
 	os << par.snps;
 	os << par.heritabilities;
 	os << par.chi;
-	os << par.dataslim;
+	os << "Write slim data : " << par.write_slim_data;
 	return os;
 }
 
@@ -63,7 +68,7 @@ Parameters::Parameters(){
 }
 
 //Constructor-Parser from command line
-Parameter::Parameter(string cmdline, string paramname,string ofile) {
+Parameter::Parameter(string cmdline, string paramname, string ofile) {
 
 	name = paramname;
 	outfile=ofile;
@@ -136,19 +141,93 @@ string Parameter::delfromcmdline(string cmdline){
 
 //	Constructor, which gets info about all parameters from cmdline
 Parameters::Parameters(int argc,char* argv[]) {
-	static string cmdline=get_cmd_line(argc,argv);
-	unsigned int seppos = cmdline.find(sep); // 	first separator's position
-	string filename = cmdline.substr(0, seppos);
-	cmdline.erase(0,seppos);//Erase file name
+
+	get_help = false;
+	get_info = false;
+	write_datadims = false;
+	write_slim_data = false;
+	default_outfile = true;
+
+	//get input file names and delete it from argv[]
+	string filename= argv[1];
+	if (filename.find("--")==0||filename.find("-h")==0)
+		get_help=true;
 	iout_fname = filename + ".iout";
 	out_fname = filename + ".out";
-	//h = Parameter(cmdline,"h","");
-	help = Parameter(cmdline,"help","");
-	info = Parameter(cmdline, "info","");
-	cmdline=info.delfromcmdline(cmdline);
-	datadims = Parameter(cmdline, "datadims","datadims.txt");
-	cmdline=datadims.delfromcmdline(cmdline);
-	snpnames = Parameter(cmdline, "snpnames","snpnames.txt");
+	argv[1] = " ";
+
+	const char* short_options = "hidn::m::t::s::e::c:l:o";
+
+	const struct option long_options[] = {
+			{"help",no_argument,NULL,'h'},
+			{"info",no_argument,NULL,'i'},
+			{"datadims",no_argument,NULL,'d'},
+			{"traitnames",optional_argument,NULL,'n'},
+			{"snpnames",optional_argument,NULL,'m'},
+			{"traits",optional_argument,NULL,'t'},
+			{"snps",optional_argument,NULL,'s'},
+			{"herit",optional_argument,NULL,'e'},
+			{"chi",required_argument,NULL,'c'},
+			{"dataslim",no_argument,NULL,'l'},
+			{"outfile",required_argument,NULL,'o'},
+			{NULL,0,NULL,0}
+	};
+
+	int rez = 0;
+	int option_index = 0;
+		while((rez=getopt_long(argc,argv,short_options,long_options,&option_index))!=-1){
+			switch (rez){
+			case 'h' :{
+				get_help=true;
+				break;
+			}
+			case 'i':{
+				get_info=true;
+				break;
+			}
+			case 'd':{
+				write_datadims=true;
+				break;
+			}
+			case 'n':{
+				write_datadims=true;
+				break;
+			}
+			case 'm':{
+				write_datadims=true;
+				break;
+			}
+			case 't':{
+				write_datadims=true;
+				break;
+			}
+			case 's':{
+				write_datadims=true;
+				break;
+			}
+			case 'e':{
+				write_datadims=true;
+				break;
+			}
+			case 'c':{
+				write_datadims=true;
+				break;
+			}
+			case 'l':{
+				write_slim_data=true;
+				break;
+			}
+			case 'o':{
+				default_outfile = false;
+				outfile=optarg;
+				break;
+			}
+			}
+
+		}
+	//
+	static string cmdline=get_cmd_line(argc,argv);
+/*	snpnames = Parameter(cmdline, "snpnames","snpnames.txt");
 	cmdline=snpnames.delfromcmdline(cmdline);
 	traitnames = Parameter(cmdline, "traitnames","traitnames.txt");
 	cmdline=traitnames.delfromcmdline(cmdline);
@@ -159,17 +238,15 @@ Parameters::Parameters(int argc,char* argv[]) {
 	heritabilities = Parameter(cmdline, "heritabilities","estimates.txt");
 	cmdline=heritabilities.delfromcmdline(cmdline);
 	chi = Parameter(cmdline, "chi","chi_data.txt");
-	cmdline=	chi.delfromcmdline(cmdline);
-	dataslim= Parameter(cmdline, "dataslim","slim_data.txt");
-	cmdline=	dataslim.delfromcmdline(cmdline);
-	test= Parameter(cmdline, "test","test.txt");
-	cmdline=test.delfromcmdline(cmdline);
-	defaultstate=datadims.use+snpnames.use+traitnames.use+traits.use+snps.use+heritabilities.use+chi.use+dataslim.use+test.use;
+	cmdline=chi.delfromcmdline(cmdline);
+	defaultstate=write_datadims+snpnames.use+traitnames.use+traits.use
+			+snps.use+heritabilities.use+chi.use+write_slim_data+run_test;
 	if(traits.outfile!="data.txt"&&snps.outfile!="data.txt"){
 		cout<<"You've set outfile name in <<traits>> and <<snps>> parameters"<<endl;
 		cout<<"Please, set outfile name for data ones"<<endl;
 		exit(1);
-	}
+	}*/
+
 }
 
 void Parameter::setbynames(vector<string> names){

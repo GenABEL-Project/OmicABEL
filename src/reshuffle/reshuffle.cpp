@@ -299,17 +299,17 @@ void Reshuffle::write_herest(ifstream& out_file, ofstream& herest){
 }
 
 void Reshuffle::run(){
-	if((*p_Parameters).datadims.use){
-		ofstream datadims((*p_Parameters).datadims.outfile.c_str());
+	if((*p_Parameters).write_datadims){
+		ofstream datadims((*p_Parameters).outfile.c_str());
 		write_datadims(datadims);
 	}
 	if((*p_Parameters).snpnames.use){
-		ofstream snpnames((*p_Parameters).snpnames.outfile.c_str());
+		ofstream snpnames((*p_Parameters).outfile.c_str());
 		write_snpnames(snpnames);
 	}
 
 	if((*p_Parameters).traitnames.use){
-		ofstream traitnames((*p_Parameters).traitnames.outfile.c_str());
+		ofstream traitnames((*p_Parameters).outfile.c_str());
 		write_traitnames(traitnames);
 	}
 
@@ -341,29 +341,29 @@ void Reshuffle::run(){
 	if((((*p_Parameters).traits.use||(*p_Parameters).snps.use)&&!(*p_Parameters).chi.use)||!(*p_Parameters).defaultstate){
 		ofstream data;
 		if((*p_Parameters).traits.outfile!="data.txt"){
-			data.open((*p_Parameters).traits.outfile.c_str());
+			data.open((*p_Parameters).outfile.c_str());
 		}else
 			if((*p_Parameters).snps.outfile!="data.txt"){
-				data.open((*p_Parameters).snps.outfile.c_str());
+				data.open((*p_Parameters).outfile.c_str());
 			}else
 				data.open("data.txt");
 		write_data(out_file,data);
 	}
 
-	if((*p_Parameters).chi.use&&!(*p_Parameters).dataslim.use){
-		ofstream chi_data((*p_Parameters).chi.outfile.c_str());
+	if((*p_Parameters).chi.use&&!(*p_Parameters).write_slim_data){
+		ofstream chi_data((*p_Parameters).outfile.c_str());
 		write_data_chi(out_file,chi_data);
 
 	}
 
-	if((*p_Parameters).dataslim.use){
-		ofstream dataslim((*p_Parameters).dataslim.outfile.c_str());
+	if((*p_Parameters).write_slim_data){
+		ofstream dataslim((*p_Parameters).outfile.c_str());
 		write_slim_data(out_file,dataslim);
 
 	}
 
 	if((*p_Parameters).heritabilities.use){
-		ofstream herest((*p_Parameters).heritabilities.outfile.c_str());
+		ofstream herest((*p_Parameters).outfile.c_str());
 		write_herest(out_file,herest);
 	}
 }
