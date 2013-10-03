@@ -10,56 +10,53 @@ using namespace std;
 
 string sep = "--"; // Set separator for cmdline
 
-//	Convert cmdline to string
-string Parameters::get_cmd_line(int argc, char* argv[]) {
-	string cmd_line = "";
-	for (int i = 1; i < argc; i++) {
-		cmd_line += argv[i];
-	}
-	cmd_line += sep; // Need for cmdline parsing
-	return cmd_line;
-}
 //Default constructor
 Parameter::Parameter() {
 	name = "None";
 	use = false;
-	value = "all";
+	def_value = true;
 }
 
 //Overloading operator cout for class Parameter
 ostream &operator <<(ostream &os, Parameter par) {
-	os << "PARAMETR" << "\t" << par.name << "\t" << "USE" << "\t" << par.use
-			<< "\t" << "VALUE" << "\t" << par.value;
+	os << "\nPARAMETR" << "\t" << par.name << "\t" << "USE" << "\t" << par.use<<"\t"<<"Use def_val "<<par.def_value;
 	cout<<"\tNumbers set ";
 	for (set<int>::iterator it= par.numbersset.begin();it!=par.numbersset.end();it++)
 		os <<*it<<" ";
 	cout<<"\tNames set ";
 	for (set<string>::iterator it= par.namesset.begin();it!=par.namesset.end();it++)
 		os <<*it<<" ";
-	//os<<"\toutfile="<<par.outfile;
-	os<<endl;
 	return os;
 }
 
 //Overloading operator cout for class Parameters
 ostream &operator <<(ostream &os, Parameters par) {
-	os << "OmicABEL iout_file is "<<par.iout_fname<<endl;
-	os << "OmicABEL out_file is "<<par.out_fname<<endl;
+	os << "\nOmicABEL iout_file is "<<par.iout_fname;
+	os << "\nOmicABEL out_file is "<<par.out_fname;
 	if (par.default_outfile){
-		os << "Using default out file name"<<endl;
+		os << "\nUsing default out file name";
 	}else
-		os << "Out file name : "<<par.outfile<<endl;
-
-	os << "Print help : " << par.get_help<<endl;
-	os << "Print info : " << par.get_info<<endl;
-	os << "Write data dimension : " << par.write_datadims<<endl;
-	os << par.snpnames;
-	os << par.traitnames;
-	os << par.traits;
-	os << par.snps;
-	os << par.heritabilities;
-	os << par.chi;
-	os << "Write slim data : " << par.write_slim_data;
+		os << "\nOut file name : "<<par.outfile;
+	if(par.get_help)
+		os << "\nPrinting help";
+	if(par.get_info)
+		os << "\nPrinting info about run";
+	if(par.write_datadims)
+		os << "\nWriting data dimension";
+	if(par.snpnames.use)
+		os << par.snpnames;
+	if(par.traitnames.use)
+		os << par.traitnames;
+	if(par.traits.use)
+		os << par.traits;
+	if(par.snps.use)
+		os << par.snps;
+	if(par.herit.use)
+		os << par.herit;
+	if(par.chi.use)
+		os << par.chi;
+	if(par.write_slim_data)
+			os << "\nWriting slim data";
 	return os;
 }
 
@@ -67,76 +64,48 @@ ostream &operator <<(ostream &os, Parameters par) {
 Parameters::Parameters(){
 }
 
-//Constructor-Parser from command line
-Parameter::Parameter(string cmdline, string paramname, string ofile) {
-
+//Constructor-Parser from command line argument
+Parameter::Parameter(char* cmd_val, string paramname) {
 	name = paramname;
-	outfile=ofile;
-	int parpos = cmdline.find("--"+name)+2; //	position of substring with param's name
-	if (parpos != string::npos+2) { //	check  [FOUND OR NOT]
-		string val = "";
-		unsigned int iter = parpos + name.size() + 1; //	iterator, which run from "=" to sep
-		unsigned int seppos = cmdline.find(sep, parpos); // 	separator position
-		while (iter < seppos) {
-			val += cmdline.at(iter); // build value of parameter
-			iter++;
-		}
-
-		use = true;
-		if (val.size() != 0) {
-			value = val;
-			string val_d=val+",";
-			string str_tmp="";
-			for(unsigned int i=0;i<val_d.size();i++){
-				if(val_d[i]!=','){
-				str_tmp+=val_d[i];
-				}else {
-					string str2="";
-					int postire=str_tmp.find("-");
-					if(postire!=string::npos){
-						string start="";
-						string end="";
-						for(int i=0;i<postire;i++){
-							start+=str_tmp[i];
-						}
-						for(int i=(postire+1);i<str_tmp.size();i++){
-							end+=str_tmp[i];
-						}
-						for(int i=atoi(start.c_str())-1;i<atoi(end.c_str());i++){
-							numbersset.insert(i);
-						}
-					}else if(atoi(str_tmp.c_str())!=0){
-						numbersset.insert(atoi(str_tmp.c_str())-1);
-					}else{
-						if(str_tmp.find("file=")!=string::npos){//Fill outfile name
-							str_tmp=str_tmp.erase(0,5);
-							outfile=str_tmp;
-							value.erase(value.find("file="),5+str_tmp.size());//kill filename substring in value
-						}else
-							namesset.insert(str_tmp);
+	use=true;
+	if (cmd_val!=NULL) {
+		def_value=false;
+		string value = cmd_val;
+		string val_d=value+",";
+		string str_tmp="";
+		for(unsigned int i=0;i<val_d.size();i++){
+			if(val_d[i]!=','){
+			str_tmp+=val_d[i];
+			}else {
+				string str2="";
+				int postire=str_tmp.find("-");
+				if(postire!=string::npos){
+					string start="";
+					string end="";
+					for(int i=0;i<postire;i++){
+						start+=str_tmp[i];
 					}
-					str_tmp="";
+					for(int i=(postire+1);i<str_tmp.size();i++){
+						end+=str_tmp[i];
+					}
+					for(int i=atoi(start.c_str())-1;i<atoi(end.c_str());i++){
+						numbersset.insert(i);
+					}
+				}else if(atoi(str_tmp.c_str())!=0){
+					numbersset.insert(atoi(str_tmp.c_str())-1);
+				}else{
+					if(str_tmp.find("file=")!=string::npos){//Fill outfile name
+						str_tmp=str_tmp.erase(0,5);
+						value.erase(value.find("file="),5+str_tmp.size());//kill filename substring in value
+					}else
+						namesset.insert(str_tmp);
 				}
+				str_tmp="";
 			}
-		} else
-			value = "all"; // default value for parameters is "all"
-		if(value.size()==0)
-			value="all";
-
-	} else { // If parameter aren't in cmdline
-		use = false;
-		value = "None";
+		}
+	} else{
+		def_value = true; // default value for parameters is "all"
 	}
-}
-
-string Parameter::delfromcmdline(string cmdline){
-	if(use){
-		int val=value.size();
-		if(value=="None"||value=="all")
-			val=-1;
-		cmdline.replace(cmdline.find(name)-2,name.size()+val+3,"");
-	}
-	return cmdline;
 }
 
 //	Constructor, which gets info about all parameters from cmdline
@@ -172,7 +141,6 @@ Parameters::Parameters(int argc,char* argv[]) {
 			{"outfile",required_argument,NULL,'o'},
 			{NULL,0,NULL,0}
 	};
-
 	int rez = 0;
 	int option_index = 0;
 		while((rez=getopt_long(argc,argv,short_options,long_options,&option_index))!=-1){
@@ -190,27 +158,32 @@ Parameters::Parameters(int argc,char* argv[]) {
 				break;
 			}
 			case 'n':{
-				write_datadims=true;
+				traitnames = Parameter(optarg,"traitnames");
 				break;
 			}
 			case 'm':{
-				write_datadims=true;
+				snpnames = Parameter(optarg,"snpnames");
 				break;
 			}
 			case 't':{
-				write_datadims=true;
+				traits = Parameter(optarg,"traits");
 				break;
 			}
 			case 's':{
-				write_datadims=true;
+				snps = Parameter(optarg,"snps");
 				break;
 			}
 			case 'e':{
-				write_datadims=true;
+				herit = Parameter(optarg,"herit");
 				break;
 			}
 			case 'c':{
-				write_datadims=true;
+				chi = Parameter(optarg,"chi");
+				if (chi.numbersset.size()==0){
+					cout<<"\nChi value is not a number. Please, set correct Chi value";
+					exit(1);
+				}
+
 				break;
 			}
 			case 'l':{
@@ -225,28 +198,11 @@ Parameters::Parameters(int argc,char* argv[]) {
 			}
 
 		}
-	//
-	static string cmdline=get_cmd_line(argc,argv);
-/*	snpnames = Parameter(cmdline, "snpnames","snpnames.txt");
-	cmdline=snpnames.delfromcmdline(cmdline);
-	traitnames = Parameter(cmdline, "traitnames","traitnames.txt");
-	cmdline=traitnames.delfromcmdline(cmdline);
-	traits = Parameter(cmdline, "traits","data.txt");
-	cmdline=traits.delfromcmdline(cmdline);
-	snps = Parameter(cmdline, "snps","data.txt");
-	cmdline=snps.delfromcmdline(cmdline);
-	heritabilities = Parameter(cmdline, "heritabilities","estimates.txt");
-	cmdline=heritabilities.delfromcmdline(cmdline);
-	chi = Parameter(cmdline, "chi","chi_data.txt");
-	cmdline=chi.delfromcmdline(cmdline);
-	defaultstate=write_datadims+snpnames.use+traitnames.use+traits.use
-			+snps.use+heritabilities.use+chi.use+write_slim_data+run_test;
-	if(traits.outfile!="data.txt"&&snps.outfile!="data.txt"){
-		cout<<"You've set outfile name in <<traits>> and <<snps>> parameters"<<endl;
-		cout<<"Please, set outfile name for data ones"<<endl;
-		exit(1);
-	}*/
-
+		defaultstate=write_datadims+snpnames.use+traitnames.use+traits.use
+					+snps.use+herit.use+chi.use+write_slim_data;
+		param_coutner = write_datadims+snpnames.use+traitnames.use +
+				(traits.use||snps.use||chi.use) +
+				(write_slim_data&&chi.use);
 }
 
 void Parameter::setbynames(vector<string> names){
@@ -289,25 +245,25 @@ void Parameter::setbynames(vector<string> names){
 				cout<<"REGEXP="<<regexp<<endl;
 			}
 		}
-			for (set<string>::iterator nameit=namesset.begin();nameit!=namesset.end();++nameit){
-				if((*nameit).find("regexp")==string::npos){
-					for(int i=0;i<names.size();i++){
-						if(names[i]==*nameit){
-							numbersset.insert(i);
-							find=1;
-							break;
-						}
+		for (set<string>::iterator nameit=namesset.begin();nameit!=namesset.end();++nameit){
+			if((*nameit).find("regexp")==string::npos){
+				for(int i=0;i<names.size();i++){
+					if(names[i]==*nameit){
+						numbersset.insert(i);
+						find=1;
+						break;
 					}
-					if(find==1)
-						continue;
-				}else{
-					for(int i=0;i<names.size();i++){
-						if((names[i]).find(regexp)==0){
-							numbersset.insert(i);
-							find=1;
-						}
+				}
+				if(find==1)
+					continue;
+			}else{
+				for(int i=0;i<names.size();i++){
+					if((names[i]).find(regexp)==0){
+						numbersset.insert(i);
+						find=1;
 					}
 				}
 			}
 		}
+	}
 }

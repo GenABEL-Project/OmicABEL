@@ -71,11 +71,11 @@ ostream &operator <<(ostream &os,iout_header header) {
 }
 
 ostream &operator <<(ostream &os,labels_data labels) {
-	os <<"NUMBER OF BETAS\t"<<(*labels.beta).size()<<endl;
-	os <<"NUMBER OF SE\t"<<(*labels.se).size()<<endl;
-	os <<"NUMBER OF COVS\t"<<(*labels.cov).size()<<endl;
-	os <<"NUMBER OF SNPNAMES\t"<<(*labels.snp_names).size()<<endl;
-	os <<"NUMBER OF TRAITNAMES\t"<<(*labels.trait_names).size()<<endl;
+	os <<"\nNUMBER OF BETAS\t"<<(*labels.beta).size();
+	os <<"\nNUMBER OF SE\t"<<(*labels.se).size();
+	os <<"\nNUMBER OF COVS\t"<<(*labels.cov).size();
+	os <<"\nNUMBER OF SNPNAMES\t"<<(*labels.snp_names).size();
+	os <<"\nNUMBER OF TRAITNAMES\t"<<(*labels.trait_names).size();
 
 	return os;
 }
@@ -86,18 +86,11 @@ long long iout_file::tilecoordinates(int traitNo, int snpNo) {
 	int t_off = traitNo % header.tile_t;
 	int m_tile = snpNo / header.tile_m;
 	int m_off = snpNo % header.tile_m;
-
 	int per_trait_per_snp = header.p + header.p * (header.p + 1) / 2;
 
-	//cout <<t_tile<<endl<<t_off<<endl<<m_tile<<endl<<m_off<<endl<<endl;
-	//cout<<(tileCoor)<<endl;
 	tileCoor = (long long)t_tile * header.m * header.tile_t;
-	//cout<<(tileCoor)<<endl;
 	tileCoor += (long long)m_tile * header.tile_m * min(header.tile_t,header.t - header.tile_t * t_tile);
-	//cout<<(tileCoor)<<endl;
 	tileCoor += (long long)t_off * min(header.tile_m, header.m - header.tile_m * m_tile)+ m_off;
-	//cout<<(tileCoor)<<endl;
 	tileCoor *= (long long)per_trait_per_snp * sizeof(double);
-	//cout<<(tileCoor)<<endl;
 	return tileCoor;
 }

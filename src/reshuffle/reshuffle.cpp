@@ -6,12 +6,6 @@
  */
 
 #include "reshuffle.h"
-#include <ctime>
-#include <math.h>
-#include <iterator>
-#include <list>
-#include <sstream>
-#include <string>
 
 using namespace std;
 
@@ -26,50 +20,41 @@ Reshuffle::Reshuffle(iout_file &iout,Parameters &Params){
 					* sizeof(double);
 }
 
-string Reshuffle::create_filename(string prename, string name) {
-	string path = prename + "_"+name+".txt";
-	return path;
-}
-string Reshuffle::create_filename(string name) {
-	string path = name+".txt";
-	return path;
-}
-
 void Reshuffle::write_datadims(ofstream& txt_datadims){
 
 	txt_datadims << "Number of traits\t" << (*p_iout_file).header.t << endl;
 	txt_datadims << "Number of SNP\t" << (*p_iout_file).header.m << endl;
 	txt_datadims << "Number of covariates\t" << ((*p_iout_file).header.p - 2);
-	cout<<"End_write_data_dimension\t"<< double(clock()) / CLOCKS_PER_SEC <<" sec" << endl;
+	cout<<"End write data dimension\t"<< double(clock()) / CLOCKS_PER_SEC <<" sec" << endl;
 }
 
 void Reshuffle::write_snpnames(ofstream& txt_snpnames){
 
-	if ((*p_Parameters).snpnames.value == "all"){
+	if ((*p_Parameters).snpnames.def_value){
 		for (unsigned int i=0;i<(*(*p_iout_file).labels.snp_names).size();i++)
 			(*p_Parameters).snpnames.numbersset.insert(i);
-		cout<<"SNPNAMES VALUE SET CHANGED TO ALL"<<endl;
+		cout<<"\nWriting all SNP's names";
 	}
 	for(set<int>::iterator it= (*p_Parameters).snpnames.numbersset.begin();it!=(*p_Parameters).snpnames.numbersset.end();++it)
-		txt_snpnames << "SNP #"<<(*it+1)<<"\t"<<(*(*p_iout_file).labels.snp_names)[*it]<<endl;
-	cout<<"END WRITE SNPNAMES\t" << double(clock()) / CLOCKS_PER_SEC <<" sec" << endl;
+		txt_snpnames << "\nSNP #"<<(*it+1)<<"\t"<<(*(*p_iout_file).labels.snp_names)[*it];
+	cout<<"\nEnd write SNP's names\t" << double(clock()) / CLOCKS_PER_SEC <<" sec";
 }
 
 void Reshuffle::write_traitnames(ofstream& txt_traitnames){
 
-	if ((*p_Parameters).traitnames.value == "all"){
+	if ((*p_Parameters).traitnames.def_value){
 		for (unsigned int i=0;i<(*(*p_iout_file).labels.trait_names).size();i++)
 			(*p_Parameters).traitnames.numbersset.insert(i);
-		cout<<"TRAITNAMES VALUE SET CHANGED TO ALL"<<endl;
+		cout<<"\nWriting all trait's names";
 	}
 	for(std::set<int>::iterator it= (*p_Parameters).traitnames.numbersset.begin();it!=p_Parameters->traitnames.numbersset.end();++it)
-		txt_traitnames<<"TRAIT #"<<(*it+1)<<"\t"<<(*(*p_iout_file).labels.trait_names)[*it]<<endl;
-	cout<<"END WRITE TRAITNAMES\t" << double(clock()) / CLOCKS_PER_SEC <<" sec" << endl;
+		txt_traitnames<<"TRAIT #"<<(*it+1)<<"\t"<<(*(*p_iout_file).labels.trait_names)[*it];
+	cout<<"\nEnd write trait's names\t" << double(clock()) / CLOCKS_PER_SEC <<" sec" << endl;
 }
 
 void Reshuffle::write_data(ifstream& out_file,ofstream& data){
 	out_file.seekg(0, ios_base::beg);
-	cout << "Start_write_data\t" << double(clock()) / CLOCKS_PER_SEC <<" sec" << endl;
+	cout << "\nStart write data\t" << double(clock()) / CLOCKS_PER_SEC <<" sec";
 	data.precision(PRECISION_DOUBLE);
 	data<<"SNP\t";
 	data<<	"Trait\t";
@@ -89,7 +74,6 @@ void Reshuffle::write_data(ifstream& out_file,ofstream& data){
 			ostr << (*(*p_iout_file).labels.snp_names)[*snp] << "\t";
 			ostr << (*(*p_iout_file).labels.trait_names)[*trait]<<"\t";
 			pos = (*p_iout_file).tilecoordinates(*trait, *snp);
-			//cout << oldPos << "-" << pos << endl;
 			if(pos != oldPos)
 			{
 				out_file.seekg(pos,ios_base::beg);
@@ -105,19 +89,17 @@ void Reshuffle::write_data(ifstream& out_file,ofstream& data){
 		data << ostr.str();
 		ostr.str("");
 		ostr.clear();
-
-		//txt_trait.close();
-		//cout << "End_write_trait\t" << (*(*p_iout_file).labels.trait_names)[*trait] << " "<< double(clock()) / CLOCKS_PER_SEC <<" sec" << endl;
 	}
 	delete buf;
-	cout << "Finish_write_data\t" << double(clock()) / CLOCKS_PER_SEC <<" sec" << endl;
+	cout << "\nFinish write data\t" << double(clock()) / CLOCKS_PER_SEC <<" sec";
 }
 
 void Reshuffle::write_data_chi(ifstream& out_file,ofstream& txt_chi){
 	out_file.seekg(0, ios_base::beg);
 	double chi = 0;
-	double CheckChi = (*p_Parameters).chi.value == "all" ? -1.0 : atof((*p_Parameters).chi.value.c_str());
-	cout << "Start_write_chi_data=" << double(clock()) / CLOCKS_PER_SEC <<" sec" << endl;
+	set<int>::iterator chi_val = (*p_Parameters).chi.numbersset.begin();
+	double CheckChi = *chi_val+1;
+	cout << "\nStart write chi data=" << double(clock()) / CLOCKS_PER_SEC <<" sec";
 	txt_chi.precision(PRECISION_DOUBLE);
 	txt_chi << "SNP\t";
 	txt_chi << "Trait\t";
@@ -132,11 +114,9 @@ void Reshuffle::write_data_chi(ifstream& out_file,ofstream& txt_chi){
 	char s[30];
 	ostringstream ostr;
 	for (set<int>::iterator trait= (*p_Parameters).traits.numbersset.begin();trait!=(*p_Parameters).traits.numbersset.end();trait++) {
-		//ofstream txt_chi(create_filename("chi_data//chi", (*(*p_iout_file).labels.trait_names)[*trait]).c_str());
 		long long oldPos=0,pos = 0;
 		for (set<int>::iterator snp= (*p_Parameters).snps.numbersset.begin();snp!=(*p_Parameters).snps.numbersset.end();snp++) {
 			pos = (*p_iout_file).tilecoordinates(*trait, *snp);
-			//cout << oldPos << "-" << pos << endl;
 			if(pos != oldPos)
 			{
 				out_file.seekg(pos,ios_base::beg);
@@ -157,25 +137,24 @@ void Reshuffle::write_data_chi(ifstream& out_file,ofstream& txt_chi){
 		txt_chi << ostr.str();
 		ostr.str("");
 		ostr.clear();
-
-		//txt_chi.close();
-		//cout << "End_write_chi_trait\t" << (*(*p_iout_file).labels.trait_names)[*trait] << " "<< double(clock()) / CLOCKS_PER_SEC <<" sec" << endl;
 	}
 	delete buf;
-	cout << "Finish_write_chi_data\t" << double(clock()) / CLOCKS_PER_SEC <<" sec" << endl;
+	cout << "\nFinish write chi data\t" << double(clock()) / CLOCKS_PER_SEC <<" sec";
 }
 
 void Reshuffle::write_slim_data(ifstream& out_file, ofstream& txt_slim){
+	cout << "\nStart write slim data=" << double(clock()) / CLOCKS_PER_SEC <<" sec";
 	out_file.seekg(0, ios_base::beg);
 	set<int> goodtraits;
 	set<int> goodsnps;
 	double chi = 0;
-	if((*p_Parameters).chi.value=="all"||(*p_Parameters).chi.value=="None"){
-		cout << "ERROR: " << "Chi value doesn't set"<<endl;
-		cout << "Please, set Chi value to get slim data" << endl;
+	if((*p_Parameters).chi.def_value||(!(*p_Parameters).chi.use)){
+		cout << "\nERROR: " << "Chi value doesn't set";
+		cout << "\nPlease, set Chi value to get slim data";
 		exit(1);
 	}
-	double CheckChi = atof((*p_Parameters).chi.value.c_str());
+	set<int>::iterator chi_val = (*p_Parameters).chi.numbersset.begin();
+	double CheckChi = *chi_val+1;
 	double* buf = new double[per_trait_per_snp];
 	for (set<int>::iterator trait= (*p_Parameters).traits.numbersset.begin();trait!=(*p_Parameters).traits.numbersset.end();trait++) {
 		long long oldPos=0,pos = 0;
@@ -232,7 +211,7 @@ void Reshuffle::write_slim_data(ifstream& out_file, ofstream& txt_slim){
 		ostr.clear();
 	}
 	delete buf;
-	cout <<"End_write_slim_data\t" << double(clock()) / CLOCKS_PER_SEC <<" sec" << endl;
+	cout <<"\nEnd write slim data\t" << double(clock()) / CLOCKS_PER_SEC <<" sec";
 }
 
 int Reshuffle::est_shift(int counter){
@@ -248,14 +227,15 @@ int Reshuffle::est_beta_shift(int counter){
 }
 
 void Reshuffle::write_herest(ifstream& out_file, ofstream& herest){
+	cout << "\nStart write heritabilities and estimates=" << double(clock()) / CLOCKS_PER_SEC <<" sec";
 	ofstream txt_est("estimates.txt");
 	out_file.seekg(herest_startpos, ios_base::beg);
-	if (p_Parameters->heritabilities.value == "all")
+	if (p_Parameters->herit.def_value)
 		for(unsigned int i=0;i<(*(p_iout_file->labels.trait_names)).size();i++)
-			p_Parameters->heritabilities.numbersset.insert(i);
+			p_Parameters->herit.numbersset.insert(i);
 	txt_est.precision(PRECISION_DOUBLE);
 	txt_est<<"\t";
-	for (set<int>::iterator trait= p_Parameters->heritabilities.numbersset.begin();trait!=p_Parameters->heritabilities.numbersset.end();trait++)
+	for (set<int>::iterator trait= p_Parameters->herit.numbersset.begin();trait!=p_Parameters->herit.numbersset.end();trait++)
 		txt_est << (*(p_iout_file->labels.trait_names))[*trait] << "\t";
 	txt_est << endl;
 	list<string> est_names;
@@ -266,7 +246,7 @@ void Reshuffle::write_herest(ifstream& out_file, ofstream& herest){
 	int counter=0;
 	for (list<string>::iterator name = est_names.begin();name != est_names.end(); ++name) {
 		txt_est << *name << "\t";
-		for (std::set<int>::iterator trait= p_Parameters->heritabilities.numbersset.begin();trait!=p_Parameters->heritabilities.numbersset.end();++trait) {
+		for (std::set<int>::iterator trait= p_Parameters->herit.numbersset.begin();trait!=p_Parameters->herit.numbersset.end();++trait) {
 			out_file.seekg(*trait*sizeof(double),ios_base::cur);
 			out_file.read((char *) &tmp_number, sizeof(double));
 			txt_est << tmp_number << "\t";
@@ -283,7 +263,7 @@ void Reshuffle::write_herest(ifstream& out_file, ofstream& herest){
 		if (beta != (*(p_iout_file->labels.beta)).size()) {
 			beta--;
 			txt_est << (*(p_iout_file->labels).beta)[beta] << "\t";
-			for (std::set<int>::iterator trait= p_Parameters->heritabilities.numbersset.begin();trait!=p_Parameters->heritabilities.numbersset.end();++trait) {
+			for (std::set<int>::iterator trait= p_Parameters->herit.numbersset.begin();trait!=p_Parameters->herit.numbersset.end();++trait) {
 				out_file.seekg(*trait*sizeof(double),ios_base::cur);
 				out_file.read((char *) &tmp_number, sizeof(double));
 				txt_est << tmp_number << "\t";
@@ -295,7 +275,7 @@ void Reshuffle::write_herest(ifstream& out_file, ofstream& herest){
 			beta++;
 		}
 	}
-	cout << "End_write_estimates\t" << double(clock()) / CLOCKS_PER_SEC <<" sec" << endl;
+	cout << "\nEnd write heritabilities and estimates\t" << double(clock()) / CLOCKS_PER_SEC <<" sec";
 }
 
 void Reshuffle::run(){
@@ -316,8 +296,8 @@ void Reshuffle::run(){
 	//Open *.out to read data
 	ifstream out_file((*p_Parameters).out_fname.c_str(), ios::binary | ios::in);
 	if (!out_file) {
-		cout << "Error open " << (*p_Parameters).out_fname << " file";
-		cout << "Maybe, file doesn't exist" << endl;
+		cout << "\nError open " << (*p_Parameters).out_fname << " file";
+		cout << "\nMaybe, file doesn't exist";
 		exit(1);
 	}
 
@@ -325,28 +305,21 @@ void Reshuffle::run(){
 	//(if their values are default all)
 	if((*p_Parameters).traits.use||(*p_Parameters).snps.use||(*p_Parameters).chi.use||!(*p_Parameters).defaultstate){
 
-			if((*p_Parameters).traits.value=="all"||(*p_Parameters).traits.value=="None"){
+			if((*p_Parameters).traits.def_value||(!(*p_Parameters).traits.use)){
 				for(unsigned int i=0;i<(*(*p_iout_file).labels.trait_names).size();i++)
 				(*p_Parameters).traits.numbersset.insert(i);
-			cout<<"TRAITS VALUE SET CHANGED TO ALL"<<endl;
+			cout<<"\nWriting data for all traits";
 		}
 
-		if((*p_Parameters).snps.value=="all"||(*p_Parameters).snps.value=="None"){
+		if((*p_Parameters).snps.def_value||(!(*p_Parameters).snps.use)){
 			for(unsigned int i=0;i<(*(*p_iout_file).labels.snp_names).size();i++)
 				(*p_Parameters).snps.numbersset.insert(i);
-			cout<<"SNPS VALUE SET CHANGED TO ALL"<<endl;
+			cout<<"\nWriting data for all SNPs";
 		}
 	}
 
 	if((((*p_Parameters).traits.use||(*p_Parameters).snps.use)&&!(*p_Parameters).chi.use)||!(*p_Parameters).defaultstate){
-		ofstream data;
-		if((*p_Parameters).traits.outfile!="data.txt"){
-			data.open((*p_Parameters).outfile.c_str());
-		}else
-			if((*p_Parameters).snps.outfile!="data.txt"){
-				data.open((*p_Parameters).outfile.c_str());
-			}else
-				data.open("data.txt");
+		ofstream data((*p_Parameters).outfile.c_str());
 		write_data(out_file,data);
 	}
 
@@ -362,7 +335,7 @@ void Reshuffle::run(){
 
 	}
 
-	if((*p_Parameters).heritabilities.use){
+	if((*p_Parameters).herit.use){
 		ofstream herest((*p_Parameters).outfile.c_str());
 		write_herest(out_file,herest);
 	}

@@ -2,14 +2,12 @@
  * main.cpp
  *
  *  Created on: 31.01.2013
- *      Author: Sodbo
+ *      Author: Sodbo Sharapov sharapovsodbo@gmail.com
  */
-#include <iostream>
-#include <ctime>
 #include "iout_file.h"
 #include "Parameters.h"
 #include "reshuffle.h"
-#include <iterator>
+
 
 using namespace std;
 
@@ -31,28 +29,32 @@ void print_help(){
 }
 
 int main(int argc, char* argv[]) {
-
 	if (argc==1){
 		print_help();
 	}
 	Parameters Params(argc, argv);
-	if(Params.get_info)
-		cout << Params;
 	if((Params.get_help||(Params.iout_fname==".iout"&&Params.out_fname==".out"))&&(!Params.run_test)){
 		print_help();
 	}
-	cout<<"Start reshuffeling"<<endl;
+	if(Params.get_info)
+		cout << Params;
+	if(Params.param_coutner>1){
+		cout<<"\nToo many parameters. Please, reduce number of parameters";
+		exit(1);
+	}
+
+	cout<<"\nStart reshuffeling";
 	iout_file iout_F(Params);
-	cout << "Finish iout_file read\t" << double(clock()) / CLOCKS_PER_SEC <<" sec" << endl;
+	cout << "\nFinish iout_file read\t" << double(clock()) / CLOCKS_PER_SEC <<" sec";
 
 	if(Params.traits.use)
 		Params.traits.setbynames(*(iout_F.labels.trait_names));
 	if(Params.snps.use)
 		Params.snps.setbynames(*(iout_F.labels.snp_names));
-	if(Params.heritabilities.use)
-		Params.heritabilities.setbynames(*(iout_F.labels.trait_names));
+	if(Params.herit.use)
+		Params.herit.setbynames(*(iout_F.labels.trait_names));
 	Reshuffle reshh(iout_F,Params);
 	reshh.run();
-	cout << "Finish reshuffling " << double(clock()) / CLOCKS_PER_SEC <<" sec" << endl;
+	cout << "\nFinish reshuffling " << double(clock()) / CLOCKS_PER_SEC <<" sec";
 	return (0);
 }

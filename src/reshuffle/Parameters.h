@@ -22,13 +22,11 @@ class Parameter {
 public:
 	string name; 	//name of parameter
 	bool use; 	// Parameter use or not (Is parameter in command line?)
-	string value; 	// value of parameter,chars after "=" symbol
+	bool def_value; 	// using default value
 	set<int> numbersset;
 	set<string> namesset;
-	string delfromcmdline(string);
 	void setbynames(vector<string>);
-	string outfile;
-	Parameter(string,string,string); 	//constructor
+	Parameter(char*,string); 	//constructor
 	Parameter();		//default constructor
 };
 
@@ -49,12 +47,12 @@ public:
 	Parameter traitnames;
 	Parameter traits;
 	Parameter snps;
-	Parameter heritabilities;
+	Parameter herit;
 	Parameter chi;
 	Parameters();
 	Parameters(int, char*[]);		//	Constructor from cmdline
-	static string get_cmd_line(int,char*[]);
 	bool defaultstate;//Check: are there parameters instead of infile's path
+	int param_coutner;
 
 };
 

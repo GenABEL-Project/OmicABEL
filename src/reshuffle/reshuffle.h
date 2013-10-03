@@ -10,6 +10,12 @@
 
 #include "Parameters.h"
 #include "iout_file.h"
+#include <ctime>
+#include <math.h>
+#include <iterator>
+#include <list>
+#include <sstream>
+#include <string>
 
 using namespace std;
 
@@ -20,8 +26,6 @@ public:
 	int per_trait_per_snp;
 	set<int> traits2write;
 	set<int> snps2write;
-	string create_filename(string, string);
-	string create_filename(string);
 	void write_datadims(ofstream&);
 	void write_snpnames(ofstream&);
 	void write_traitnames(ofstream&);
