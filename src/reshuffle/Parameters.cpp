@@ -201,7 +201,7 @@ Parameters::Parameters(int argc,char* argv[]) {
 		defaultstate=write_datadims+snpnames.use+traitnames.use+traits.use
 					+snps.use+herit.use+chi.use+write_slim_data;
 		param_coutner = write_datadims+snpnames.use+traitnames.use +
-				(traits.use||snps.use||chi.use) +
+				(traits.use||snps.use||(chi.use&&!write_slim_data)) +
 				(write_slim_data&&chi.use);
 }
 

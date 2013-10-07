@@ -25,7 +25,7 @@ void Reshuffle::write_datadims(ofstream& txt_datadims){
 	txt_datadims << "Number of traits\t" << (*p_iout_file).header.t << endl;
 	txt_datadims << "Number of SNP\t" << (*p_iout_file).header.m << endl;
 	txt_datadims << "Number of covariates\t" << ((*p_iout_file).header.p - 2);
-	cout<<"End write data dimension\t"<< double(clock()) / CLOCKS_PER_SEC <<" sec" << endl;
+	cout<<"\nEnd write data dimension\t"<< double(clock()) / CLOCKS_PER_SEC <<" sec";
 }
 
 void Reshuffle::write_snpnames(ofstream& txt_snpnames){
@@ -149,7 +149,7 @@ void Reshuffle::write_slim_data(ifstream& out_file, ofstream& txt_slim){
 	set<int> goodsnps;
 	double chi = 0;
 	if((*p_Parameters).chi.def_value||(!(*p_Parameters).chi.use)){
-		cout << "\nERROR: " << "Chi value doesn't set";
+		cout << "\nERROR: " << "Chi value doesn't exist";
 		cout << "\nPlease, set Chi value to get slim data";
 		exit(1);
 	}
@@ -280,15 +280,21 @@ void Reshuffle::write_herest(ifstream& out_file, ofstream& herest){
 
 void Reshuffle::run(){
 	if((*p_Parameters).write_datadims){
+		if(((*p_Parameters).outfile).size()==0)
+			(*p_Parameters).outfile="datadims.txt";
 		ofstream datadims((*p_Parameters).outfile.c_str());
 		write_datadims(datadims);
 	}
 	if((*p_Parameters).snpnames.use){
+		if(((*p_Parameters).outfile).size()==0)
+			(*p_Parameters).outfile="snpnames.txt";
 		ofstream snpnames((*p_Parameters).outfile.c_str());
 		write_snpnames(snpnames);
 	}
 
 	if((*p_Parameters).traitnames.use){
+		if(((*p_Parameters).outfile).size()==0)
+			(*p_Parameters).outfile="traitnames.txt";
 		ofstream traitnames((*p_Parameters).outfile.c_str());
 		write_traitnames(traitnames);
 	}
@@ -319,23 +325,31 @@ void Reshuffle::run(){
 	}
 
 	if((((*p_Parameters).traits.use||(*p_Parameters).snps.use)&&!(*p_Parameters).chi.use)||!(*p_Parameters).defaultstate){
+		if(((*p_Parameters).outfile).size()==0)
+			(*p_Parameters).outfile="data.txt";
 		ofstream data((*p_Parameters).outfile.c_str());
 		write_data(out_file,data);
 	}
 
 	if((*p_Parameters).chi.use&&!(*p_Parameters).write_slim_data){
+		if(((*p_Parameters).outfile).size()==0)
+			(*p_Parameters).outfile="data_chi.txt";
 		ofstream chi_data((*p_Parameters).outfile.c_str());
 		write_data_chi(out_file,chi_data);
 
 	}
 
 	if((*p_Parameters).write_slim_data){
+		if(((*p_Parameters).outfile).size()==0)
+			(*p_Parameters).outfile="data_slim.txt";
 		ofstream dataslim((*p_Parameters).outfile.c_str());
 		write_slim_data(out_file,dataslim);
 
 	}
 
 	if((*p_Parameters).herit.use){
+		if(((*p_Parameters).outfile).size()==0)
+			(*p_Parameters).outfile="heritab.txt";
 		ofstream herest((*p_Parameters).outfile.c_str());
 		write_herest(out_file,herest);
 	}
