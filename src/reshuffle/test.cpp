@@ -55,8 +55,8 @@ void test::run(ofstream& test_txt){
 		Params_test->traits.setbynames(*(iout_F.labels.trait_names));
 	if(Params_test->snps.use)
 		Params_test->snps.setbynames(*(iout_F.labels.snp_names));
-	if(Params_test->heritabilities.use)
-		Params_test->heritabilities.setbynames(*(iout_F.labels.trait_names));
+	if(Params_test->herit.use)
+		Params_test->herit.setbynames(*(iout_F.labels.trait_names));
 	Reshuffle reshh(iout_F,*Params_test);
 	reshh.run();
 	ifstream result_f(result.c_str());
