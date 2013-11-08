@@ -228,16 +228,15 @@ int Reshuffle::est_beta_shift(int counter){
 
 void Reshuffle::write_herest(ifstream& out_file, ofstream& herest){
 	cout << "\nStart write heritabilities and estimates=" << double(clock()) / CLOCKS_PER_SEC <<" sec";
-	ofstream txt_est("estimates.txt");
 	out_file.seekg(herest_startpos, ios_base::beg);
 	if (p_Parameters->herit.def_value)
 		for(unsigned int i=0;i<(*(p_iout_file->labels.trait_names)).size();i++)
 			p_Parameters->herit.numbersset.insert(i);
-	txt_est.precision(PRECISION_DOUBLE);
-	txt_est<<"\t";
+	herest.precision(PRECISION_DOUBLE);
+	herest<<"\t";
 	for (set<int>::iterator trait= p_Parameters->herit.numbersset.begin();trait!=p_Parameters->herit.numbersset.end();trait++)
-		txt_est << (*(p_iout_file->labels.trait_names))[*trait] << "\t";
-	txt_est << endl;
+		herest << (*(p_iout_file->labels.trait_names))[*trait] << "\t";
+	herest << endl;
 	list<string> est_names;
 	est_names.insert(est_names.end(), "h2");
 	est_names.insert(est_names.end(), "var");
@@ -245,15 +244,15 @@ void Reshuffle::write_herest(ifstream& out_file, ofstream& herest){
 	double tmp_number = 0;
 	int counter=0;
 	for (list<string>::iterator name = est_names.begin();name != est_names.end(); ++name) {
-		txt_est << *name << "\t";
+		herest << *name << "\t";
 		for (std::set<int>::iterator trait= p_Parameters->herit.numbersset.begin();trait!=p_Parameters->herit.numbersset.end();++trait) {
 			out_file.seekg(*trait*sizeof(double),ios_base::cur);
 			out_file.read((char *) &tmp_number, sizeof(double));
-			txt_est << tmp_number << "\t";
+			herest << tmp_number << "\t";
 			out_file.seekg(est_shift(counter), ios_base::beg);
 		}
 		counter++;
-		txt_est << "\n";
+		herest << "\n";
 		out_file.seekg(est_shift(counter), ios_base::beg);
 	}
 	out_file.seekg(est_shift(3), ios_base::beg);
@@ -262,16 +261,16 @@ void Reshuffle::write_herest(ifstream& out_file, ofstream& herest){
 		beta++;
 		if (beta != (*(p_iout_file->labels.beta)).size()) {
 			beta--;
-			txt_est << (*(p_iout_file->labels).beta)[beta] << "\t";
+			herest << (*(p_iout_file->labels).beta)[beta] << "\t";
 			for (std::set<int>::iterator trait= p_Parameters->herit.numbersset.begin();trait!=p_Parameters->herit.numbersset.end();++trait) {
 				out_file.seekg(*trait*sizeof(double),ios_base::cur);
 				out_file.read((char *) &tmp_number, sizeof(double));
-				txt_est << tmp_number << "\t";
+				herest << tmp_number << "\t";
 				out_file.seekg(est_beta_shift(counter), ios_base::beg);
 			}
 			counter++;
 			out_file.seekg(est_beta_shift(counter), ios_base::beg);
-			txt_est << "\n";
+			herest << "\n";
 			beta++;
 		}
 	}
