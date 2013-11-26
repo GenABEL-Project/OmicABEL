@@ -21,10 +21,12 @@ void print_help(){
 	cout << "   by trait's indexes OR/AND names OR/AND regexp"<<endl<<endl;
 	cout << " --snp=<indexes OR/AND names OR/AND focus> | to get data"<<endl;
 	cout << "   by SNP's indexes OR/AND names"<<endl<<endl;
-	cout << " --heritabilities=<indexes OR/AND names OR/AND regexp>"<<endl;
+	cout << " --herit=<indexes OR/AND names OR/AND regexp>"<<endl;
 	cout << "   to get estimates of trait's heritability, sigma, res_sigma and betas"<<endl<<endl;
+	cout << " --chi | to get data with chi-square column"<<endl<<endl;
 	cout << " --chi=<number> | to get data by snp's, which chi2>number"<<endl<<endl;
 	cout << " --dataslim | to get slim data [You should set --chi=<number>]"<<endl<<endl;
+	cout << " --info | to get some information about program's run"<<endl<<endl;
 	exit(1);
 }
 
