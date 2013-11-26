@@ -13,20 +13,22 @@ using namespace std;
 
 void print_help(){
 	cout <<endl;
-	cout << "	Available commands"<<endl<<endl;
-	cout << " --datadims | to get data's dimension"<<endl<<endl;
-	cout << " --snpnames=<indexes> | to get names of SNP by indexes"<<endl<<endl;
-	cout << " --traitnames=<indexes> | to get names of trait by indexes"<<endl<<endl;
-	cout << " --traits=<indexes OR/AND names OR/AND regexp> | to get data"<<endl;
-	cout << "   by trait's indexes OR/AND names OR/AND regexp"<<endl<<endl;
-	cout << " --snp=<indexes OR/AND names OR/AND focus> | to get data"<<endl;
-	cout << "   by SNP's indexes OR/AND names"<<endl<<endl;
-	cout << " --herit=<indexes OR/AND names OR/AND regexp>"<<endl;
-	cout << "   to get estimates of trait's heritability, sigma, res_sigma and betas"<<endl<<endl;
-	cout << " --chi | to get data with chi-square column"<<endl<<endl;
-	cout << " --chi=<number> | to get data by snp's, which chi2>number"<<endl<<endl;
-	cout << " --dataslim | to get slim data [You should set --chi=<number>]"<<endl<<endl;
-	cout << " --info | to get some information about program's run"<<endl<<endl;
+	cout << "\n	Available commands";
+	cout << "\n\n --help | to get this help message";
+	cout << "\n\n --datadims | to get data's dimension";
+	cout << "\n\n --snpnames=<indexes> | to get names of SNP by indexes";
+	cout << "\n\n --traitnames=<indexes> | to get names of trait by indexes";
+	cout << "\n\n --traits=<indexes OR/AND names OR/AND regexp> | to get data";
+	cout << "\n   by trait's indexes OR/AND names OR/AND regexp";
+	cout << "\n\n --snp=<indexes OR/AND names OR/AND focus> | to get data";
+	cout << "\n   by SNP's indexes OR/AND names";
+	cout << "\n\n --herit=<indexes OR/AND names OR/AND regexp>";
+	cout << "\n   to get estimates of trait's heritability, sigma, res_sigma and betas";
+	cout << "\n\n --chi | to get data with chi-square column";
+	cout << "\n\n --chi=<number> | to get data by snp's, which chi2>number";
+	cout << "\n\n --dataslim | to get slim data with threshold over X";
+	cout << "\n   [You should set --chi=<X>]";
+	cout << "\n\n --info | to get some information about program's run"<<endl<<endl;
 	exit(1);
 }
 
