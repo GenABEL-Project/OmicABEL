@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #include "../wrappers.h"
 #include "../databel.h"
@@ -124,7 +125,17 @@ int main( int argc, char *argv[] )
 			exit( EXIT_FAILURE );
 		}
 		for ( j = 0; j < nelems_to_write; j++ )
+		{
+#if 0
+			if (isnan( datain[j] ))
+				printf("Nan in input:  %lld\n", datain[j]);
+#endif
 			dataout[j] = (double)datain[j];
+#if 0
+			if (isnan( dataout[j] ))
+				printf("Nan in output: %lld\n", dataout[j]);
+#endif
+		}
 		if ( fwrite( dataout, sizeof(double), nelems_to_write, fout ) != nelems_to_write )
 		{
 			fprintf( stderr, "Error writing data to %s\n", fout_path_fvd );

@@ -54,3 +54,18 @@ double variance( double *v, int n )
 
 	return var;
 }
+
+double _variance( double *v, int n )
+{
+	int i;
+	double m, var = 0.0;
+
+	assert( n > 1 );
+
+	m = mean( v, n );
+	for ( i = 0; i < n; i++ )
+		var += (m - v[i]) * (m - v[i]);
+	var /= n;
+
+	return var;
+}

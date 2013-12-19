@@ -52,8 +52,8 @@ void set_multi_threaded_BLAS( int nths )
     setenv("GOTO_NUM_THREADS", nths_str, 1);
     setenv("OMP_NUM_THREADS", "1", 1);
 #elif defined MKL
-	mkl_set_num_threads(nths); // Set MKL to use nths for multithreaded BLAS
-	omp_set_num_threads(nths); // Set OMP to use nths for the openmp parallel directives
+	mkl_set_num_threads(nths);
+	omp_set_num_threads(1);
 #else
     setenv("OMP_NUM_THREADS", nths_str, 1);
 #endif
@@ -63,6 +63,7 @@ void set_single_threaded_BLAS( void )
 {
 #if defined GOTO
     setenv("GOTO_NUM_THREADS", "1", 1);
+    setenv("OMP_NUM_THREADS",  "1", 1);
 #elif defined MKL
 	mkl_set_num_threads(1);
 	omp_set_num_threads(1);

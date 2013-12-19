@@ -30,5 +30,6 @@
 double mean( double *v, int n );
 
 double variance( double *v, int n );
+double _variance( double *v, int n );
 
 #endif // STATISTICS_H
