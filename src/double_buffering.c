@@ -263,7 +263,7 @@ void double_buffering_read( double_buffering *b, which_buffer wh_buff, size_t nb
 		tmp_cb->aio_offset = offset + (i * (off_t)MAX_AIO_SIZE);
 		if ( aio_read( tmp_cb ) != 0 )
 		{
-			perror("[ERROR] Couldn't read");
+			perror("[ERROR] Enqueuing aio_read request");
 			exit( EXIT_FAILURE );
 		}
 	}
@@ -276,7 +276,7 @@ void double_buffering_read( double_buffering *b, which_buffer wh_buff, size_t nb
 		tmp_cb->aio_offset = offset + (i * (off_t)MAX_AIO_SIZE);
 		if ( aio_read( tmp_cb ) != 0 )
 		{
-			perror("[ERROR] Couldn't read from XR");
+			perror("[ERROR] Enqueuing aio_read request");
 			exit( EXIT_FAILURE );
 		}
 	}
@@ -302,7 +302,7 @@ void double_buffering_write( double_buffering *b, which_buffer wh_buff, size_t n
 		tmp_cb->aio_offset = offset + (i * (size_t)MAX_AIO_SIZE);
 		if ( aio_write( tmp_cb ) != 0 )
 		{
-			perror("[ERROR] Couldn't write");
+			perror("[ERROR] Enqueuing aio_write request");
 			exit( EXIT_FAILURE );
 		}
 	}
@@ -315,7 +315,7 @@ void double_buffering_write( double_buffering *b, which_buffer wh_buff, size_t n
 		tmp_cb->aio_offset = offset + (i * (off_t)MAX_AIO_SIZE);
 		if ( aio_write( tmp_cb ) != 0 )
 		{
-			perror("[ERROR] Couldn't write");
+			perror("[ERROR] Enqueuing aio_write request");
 			exit( EXIT_FAILURE );
 		}
 	}
@@ -346,15 +346,17 @@ void double_buffering_wait( double_buffering *b, which_buffer wh_buff )
 #endif
 		if ( aio_suspend( buff->aux_l, 1, NULL ) != 0 )
 		{
-			perror("aio_suspend error");
+			// perror("aio_suspend error");
+			fprintf(stderr, "[ERROR] aio_suspend: %s", strerror(aio_error(buff->aux_l[0])));
 			exit( EXIT_FAILURE );
 		}
 
 		nbytes = aio_return( (struct aiocb *)buff->aux_l[0] );
 		if ( nbytes != buff->aux_l[0]->aio_nbytes )
 		{
-			perror("aio_suspend error - data not read completely");
-			printf("%zu read - %zu expected\n", nbytes, buff->aux_l[0]->aio_nbytes);
+			fprintf(stderr, "[ERROR] aio_return: %s", strerror(aio_error(buff->aux_l[0])));
+			// perror("aio_suspend error - data not read completely");
+			printf("%zu bytes read/write - %zu bytes expected\n", nbytes, buff->aux_l[0]->aio_nbytes);
 			exit( EXIT_FAILURE );
 		}
 #if DEBUG
