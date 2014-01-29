@@ -256,23 +256,13 @@ void Reshuffle::write_herest(ifstream& out_file, ofstream& herest){
 		out_file.seekg(est_shift(counter), ios_base::beg);
 	}
 	out_file.seekg(est_shift(3), ios_base::beg);
-	counter=0;
-	for (unsigned int beta=0;beta<(*(p_iout_file->labels.beta)).size();beta++) {
-		beta++;
-		if (beta != (*(p_iout_file->labels.beta)).size()) {
-			beta--;
-			herest << (*(p_iout_file->labels).beta)[beta] << "\t";
-			for (std::set<int>::iterator trait= p_Parameters->herit.numbersset.begin();trait!=p_Parameters->herit.numbersset.end();++trait) {
-				out_file.seekg(*trait*sizeof(double),ios_base::cur);
-				out_file.read((char *) &tmp_number, sizeof(double));
-				herest << tmp_number << "\t";
-				out_file.seekg(est_beta_shift(counter), ios_base::beg);
-			}
-			counter++;
-			out_file.seekg(est_beta_shift(counter), ios_base::beg);
-			herest << "\n";
-			beta++;
+	for (unsigned int beta=0;beta<(*(p_iout_file->labels.beta)).size()-1;beta++) {
+		herest << (*(p_iout_file->labels).beta)[beta] << "\t";
+		for (std::set<int>::iterator trait= p_Parameters->herit.numbersset.begin();trait!=p_Parameters->herit.numbersset.end();trait++) {
+			out_file.read((char *) &tmp_number, sizeof(double));
+			herest << tmp_number << "\t";
 		}
+		herest << "\n";
 	}
 	cout << "\nEnd write heritabilities and estimates\t" << double(clock()) / CLOCKS_PER_SEC <<" sec";
 }

@@ -119,7 +119,7 @@ Parameters::Parameters(int argc,char* argv[]) {
 
 	//get input file names and delete it from argv[]
 	string filename= argv[1];
-	if (filename.find("--")==0||filename.find("-h")==0)
+	if (filename.find("--help")==0||filename.find("-h")==0)
 		get_help=true;
 	iout_fname = filename + ".iout";
 	out_fname = filename + ".out";

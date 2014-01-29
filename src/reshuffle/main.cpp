@@ -37,28 +37,29 @@ int main(int argc, char* argv[]) {
 		print_help();
 	}
 	Parameters Params(argc, argv);
-	if((Params.get_help||(Params.iout_fname==".iout"&&Params.out_fname==".out"))&&(!Params.run_test)){
+	if(Params.get_help||(Params.iout_fname==".iout"&&Params.out_fname==".out")){
 		print_help();
-	}
-	if(Params.get_info)
-		cout << Params;
-	if(Params.param_coutner>1){
-		cout<<"\nToo many parameters. Please, reduce number of parameters";
-		exit(1);
-	}
+	}else{
+		if(Params.get_info)
+			cout << Params;
+		if(Params.param_coutner>1){
+			cout<<"\nToo many parameters. Please, reduce number of parameters";
+			exit(1);
+		}
 
-	cout<<"\nStart reshuffeling";
-	iout_file iout_F(Params);
-	cout << "\nFinish iout_file read\t" << double(clock()) / CLOCKS_PER_SEC <<" sec";
+		cout<<"\nStart reshuffeling";
+		iout_file iout_F(Params);
+		cout << "\nFinish iout_file read\t" << double(clock()) / CLOCKS_PER_SEC <<" sec";
 
-	if(Params.traits.use)
-		Params.traits.setbynames(*(iout_F.labels.trait_names));
-	if(Params.snps.use)
-		Params.snps.setbynames(*(iout_F.labels.snp_names));
-	if(Params.herit.use)
-		Params.herit.setbynames(*(iout_F.labels.trait_names));
-	Reshuffle reshh(iout_F,Params);
-	reshh.run();
-	cout << "\nFinish reshuffling " << double(clock()) / CLOCKS_PER_SEC <<" sec";
+		if(Params.traits.use)
+			Params.traits.setbynames(*(iout_F.labels.trait_names));
+		if(Params.snps.use)
+			Params.snps.setbynames(*(iout_F.labels.snp_names));
+		if(Params.herit.use)
+			Params.herit.setbynames(*(iout_F.labels.trait_names));
+		Reshuffle reshh(iout_F,Params);
+		reshh.run();
+		cout << "\nFinish reshuffling " << double(clock()) / CLOCKS_PER_SEC <<" sec";
+	}
 	return (0);
 }
