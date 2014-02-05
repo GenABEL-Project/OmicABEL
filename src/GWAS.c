@@ -195,4 +195,28 @@ void load_databel_info( FGLS_config_t *cf )
 	assert( cf->XL_fvi->fvi_header.numObservations == cf->Phi_fvi->fvi_header.numObservations );
 	assert( cf->XL_fvi->fvi_header.numObservations == cf->Phi_fvi->fvi_header.numVariables );
 	// Assert type is double
+	if ( cf->Phi_fvi->fvi_header.type != DOUBLE_TYPE )
+	{
+		fprintf(stderr, "[ERROR] Phi data is stored in %s format\n", TYPE2STR(cf->Phi_fvi->fvi_header.type));
+		fprintf(stderr, "[ERROR] Data must be provided in DOUBLE format. Exiting...");
+		exit(-1);
+	}
+	if ( cf->XL_fvi->fvi_header.type != DOUBLE_TYPE )
+	{
+		fprintf(stderr, "[ERROR] XL data is stored in %s format\n", TYPE2STR(cf->XL_fvi->fvi_header.type));
+		fprintf(stderr, "[ERROR] Data must be provided in DOUBLE format. Exiting...");
+		exit(-1);
+	}
+	if ( cf->XR_fvi->fvi_header.type != DOUBLE_TYPE )
+	{
+		fprintf(stderr, "[ERROR] XR data is stored in %s format\n", TYPE2STR(cf->XR_fvi->fvi_header.type));
+		fprintf(stderr, "[ERROR] Data must be provided in DOUBLE format. Exiting...");
+		exit(-1);
+	}
+	if ( cf->Y_fvi->fvi_header.type != DOUBLE_TYPE )
+	{
+		fprintf(stderr, "[ERROR] Y data is stored in %s format\n", TYPE2STR(cf->Y_fvi->fvi_header.type));
+		fprintf(stderr, "[ERROR] Data must be provided in DOUBLE format. Exiting...");
+		exit(-1);
+	}
 }

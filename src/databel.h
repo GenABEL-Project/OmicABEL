@@ -25,14 +25,27 @@
 #ifndef DATABEL_H
 #define DATABEL_H
 
-enum datatype{ UNSIGNED_SHORT_INT_TYPE = 1,
-               SHORT_INT_TYPE,
-               UNSIGNED_INT_TYPE,
-               INT_TYPE,
-               FLOAT_TYPE,
-               DOUBLE_TYPE,
-               SIGNED_CHAR_TYPE,
-               UNSIGNED_CHAR_TYPE };
+enum datatype { UNSIGNED_SHORT_INT_TYPE = 1,
+                SHORT_INT_TYPE,
+                UNSIGNED_INT_TYPE,
+                INT_TYPE,
+                FLOAT_TYPE,
+                DOUBLE_TYPE,
+                SIGNED_CHAR_TYPE,
+                UNSIGNED_CHAR_TYPE };
+
+static char *type_string[8] = {
+	"UNSIGNED SHORT INT",
+	"SHORT_INT",
+	"UNSIGNED_INT",
+	"INT",
+	"FLOAT",
+	"DOUBLE",
+	"SIGNED CHAR",
+	"UNSIGNED CHAR"
+};
+
+#define TYPE2STR(TYPE) (type_string[TYPE-1])
 
 #define NAMELENGTH 32
 #define RESERVEDSPACE 5
