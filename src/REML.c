@@ -194,10 +194,15 @@ double polygenic_REML_logLik_eig (
 	// loglik = a + b
 	//  a -> log(det(M))
 	//  b -> YmXB' inv(M) YmXB
-    dgemv_(TRANS, 
+    /*dgemv_(TRANS, 
             &n, &n, 
             &ONE, Z, &n, YmXB, &iONE,
-            &ZERO, ZtY_upd, &iONE);
+            &ZERO, ZtY_upd, &iONE);*/
+    memcpy( ZtY_upd, ZtY, n * sizeof(double) );
+    dgemv_( NO_TRANS, 
+            &n, &wXL, 
+            &MINUS_ONE, ZtX, &n, beta, &iONE,
+            &ONE, ZtY_upd, &iONE );
 	// YmXB' * inv( M ) * YmXB
 	*loglik = 0.0;
 	for (i = 0; i < n; i++ )
