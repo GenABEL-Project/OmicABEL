@@ -189,8 +189,11 @@ double polygenic_REML_logLik_eig (
             &MINUS_ONE, X, &n, beta, &iONE,
             &ONE, YmXB, &iONE );
 
+    // This was wrong
     // residual sigma and loglik
-	*res_sigma = variance( YmXB, n );
+    /**res_sigma = variance( YmXB, n );*/
+    //
+
 	// loglik = a + b
 	//  a -> log(det(M))
 	//  b -> YmXB' inv(M) YmXB
@@ -207,6 +210,10 @@ double polygenic_REML_logLik_eig (
 	*loglik = 0.0;
 	for (i = 0; i < n; i++ )
 		*loglik += ZtY_upd[i] * D[i] * D[i] * ZtY_upd[i];
+
+    // res_sigma = 1/n * ( YmXB' inv(M) YmXB )
+    *res_sigma = (*loglik) / n;
+
 	*loglik = (*loglik) / (*res_sigma); // <- b
 	// a + b -> det + loglik above
 	//   det incomplete, we must take into account the sigma scaling M -> "+ n * log(*res_sigma)"
