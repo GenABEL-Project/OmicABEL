@@ -188,7 +188,7 @@ int fgls_chol( FGLS_config_t cf )
         beta  = res_sigma[j] * (1 - h2[j]);
         dscal_(&nn, &alpha, M, &iONE);
         for ( i = 0; i < n; i++ )
-            M[i*n + i] = M[i*n + i] + beta;
+            M[i*n + i] = M[i*n + i] + beta; // size_t?
 
         /* L * L' = M */
         dpotrf_(LOWER, &n, M, &n, &info);
@@ -234,7 +234,7 @@ int fgls_chol( FGLS_config_t cf )
             VT_USER_START("READ_X");
 #endif
             /* Read next block of XR's */
-			size_t next_x_from = ((size_t)ib + x_b) >= m ?  0 : (size_t)ib + x_b;
+			size_t next_x_from = ((size_t)ib + x_b) >= m ?  0 : (size_t)ib + (size_t)x_b;
 			size_t next_x_to   = ((size_t)ib + x_b) >= m ? MIN( (size_t)x_b, (size_t)m ) - 1 : 
 				                                           next_x_from + MIN( (size_t)x_b, (size_t)m - next_x_from ) - 1;
 			double_buffering_read_XR( &db_XR, IO_BUFF, next_x_from, next_x_to );
@@ -424,7 +424,7 @@ void build_SPD_Phi( int n, double *eigVecs, double *eigVals, double *Phi )
 		   *tmp;
 	int i, j;
 
-	tmp = fgls_malloc( n * n * sizeof(double) );
+    tmp = fgls_malloc( (size_t)n * n * sizeof(double) );
 
 	// tmp = Z * W
 	for ( j = 0; j < n; j++ )

@@ -67,9 +67,9 @@ void ooc_gemm( int m, int n, int ooc_b, double *Z, char *in, char *out,
     /* Asynchronous IO data structures */
 	double *in_comp, *out_comp;
 	double_buffering db_in, db_out; // B, C
-	double_buffering_init( &db_in, ooc_b * m * sizeof(double),
+	double_buffering_init( &db_in, (size_t)ooc_b * m * sizeof(double),
 			                fp_in, NULL ); // _fp, cf not needed in this case
-	double_buffering_init( &db_out, ooc_b * m * sizeof(double),
+	double_buffering_init( &db_out, (size_t)ooc_b * m * sizeof(double),
 			                fp_out, NULL ); // _fp, cf not needed in this case
 
     /* BLAS constants */
@@ -86,7 +86,7 @@ void ooc_gemm( int m, int n, int ooc_b, double *Z, char *in, char *out,
     for ( i = 0; i < n; i += ooc_b ) 
     {
         /* Read next piece of "in" */
-        size_t nbytes = i + ooc_b > n ? 1 : MIN( ooc_b * m, ( n - (size_t)( i + ooc_b ) ) * m ) * sizeof(double);
+        size_t nbytes = i + ooc_b > n ? 1 : MIN( (size_t)ooc_b * m, ( n - (size_t)( i + ooc_b ) ) * m ) * sizeof(double);
 		off_t  offset = i + ooc_b > n ? 0 : (off_t)(i + ooc_b) * m * sizeof(double);
         double_buffering_read( &db_in, IO_BUFF, nbytes, offset );
 
@@ -123,7 +123,7 @@ void ooc_gemm( int m, int n, int ooc_b, double *Z, char *in, char *out,
 
         /* Write current piece of "out" */
 		double_buffering_write( &db_out, COMP_BUFF,
-				                MIN( ooc_b * m, (size_t)(n - i) * m ) * sizeof(double),
+				                MIN( (size_t)ooc_b * m, (size_t)(n - i) * m ) * sizeof(double),
                                 (off_t)i * m * sizeof(double) );
 
         /* Swap buffers */

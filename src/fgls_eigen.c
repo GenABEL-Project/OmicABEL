@@ -102,7 +102,6 @@ int fgls_eigen( FGLS_config_t *cf )
 
 void ooc_loops( eigen_loops_t *loops_t ) 
 {
-	/*eigen_loops_t *loops_t = ( eigen_loops_t* ) in;*/
     FGLS_config_t *cf = loops_t->cf;
   
     /* Dimensions of the problem */
@@ -292,7 +291,7 @@ void ooc_loops( eigen_loops_t *loops_t )
 									for ( l = 0; l < n; l++ )
 										XR_copy[ l ] = XR_comp[ i * n + l ] * Winv[j*n + l];
 							
-								Bij = &B_comp[ j*size_one_b_record*x_inc   + i*size_one_b_record];
+								Bij = &B_comp[ j*size_one_b_record*x_inc + i*size_one_b_record];
 			  
 								/* Building B */
 								// Copy B_T
@@ -442,11 +441,11 @@ void eigen_loops_init( eigen_loops_t *loops, int id, FGLS_config_t *cf )
     loops->oneB = ( double * ) fgls_malloc ( cf->p * cf->num_threads * sizeof(double) );
     loops->oneV = ( double * ) fgls_malloc ( cf->p * cf->p * cf->num_threads * sizeof(double) );
 
-	double_buffering_init( &loops->db_XR, (size_t)cf->n * cf->wXR * cf->x_b * sizeof(double),
+	double_buffering_init( &loops->db_XR, cf->n * cf->wXR * cf->x_b * sizeof(double),
 			                cf->ZtXR, cf ); // _fp
-	double_buffering_init( &loops->db_Y,  (size_t)cf->n * cf->y_b * sizeof(double),
+	double_buffering_init( &loops->db_Y,  cf->n * cf->y_b * sizeof(double),
 			                cf->ZtY,  cf );
-	double_buffering_init( &loops->db_B,  (size_t)size_one_b_record * cf->x_b * cf->y_b * sizeof(double),
+	double_buffering_init( &loops->db_B,  size_one_b_record * cf->x_b * cf->y_b * sizeof(double),
 			                cf->B,  cf );
 
 	loops->cf = cf;

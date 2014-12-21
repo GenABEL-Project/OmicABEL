@@ -118,7 +118,7 @@ void initialize_config(
 	// Sanity check (Phi)
 	checkNoNans(cf->n * cf->n, cf->Phi, "[ERROR] NaNs not allowed in Phi\n");
 	cf->XL   = (double *) fgls_malloc ( cf->n * cf->wXL * sizeof(double) );
-	load_file ( cf->XL_data_path,   "rb", cf->XL,   cf->n * cf->wXL );
+	load_file ( cf->XL_data_path, "rb", cf->XL, cf->n * cf->wXL );
 	// Sanity check (XL)
 	average( cf->XL, cf->n, cf->wXL, cf->threshold, "Covariate", 
 			&cf->XL_fvi->fvi_data[cf->n*NAMELENGTH], NAMELENGTH, 1, cf->num_threads );

@@ -39,7 +39,7 @@ struct databel_fvi * load_databel_fvi( char *path )
 	// Header
 	fread( &fvi->fvi_header, sizeof(databel_fvi_header), 1, f );
 	// Labels
-	data_size = (fvi->fvi_header.numVariables +fvi->fvi_header.numObservations ) * 
+	data_size = ((size_t)fvi->fvi_header.numVariables + fvi->fvi_header.numObservations ) * 
 		         fvi->fvi_header.namelength * sizeof(char);
 	fvi->fvi_data = (char *) fgls_malloc ( data_size );
 	// Load labels

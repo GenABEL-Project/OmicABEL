@@ -328,6 +328,7 @@ void average( double *data, int n, int ncols, int threshold, const char *obj_typ
 	double sum, avg;
 	int nans, infs;
 
+    // size_t n and n_cols?
 	#pragma omp parallel for private(j, sum, nans, infs, i, avg) schedule(static, 4) num_threads(nths)
 	for ( j = 0; j < ncols; j++ )
 	{

@@ -161,7 +161,7 @@ void double_buffering_read_Y(  double_buffering *b, which_buffer wh_buff, size_t
 	// Which buffer
 	/*aiocb_list *buff = wh_buff == IO_BUFF ? b->io_l : b->comp_l;*/
 	// Still buff_size available?
-	size_t nbytes = (to - from + 1) * cf->n * sizeof(double);
+	size_t nbytes = (size_t)(to - from + 1) * cf->n * sizeof(double);
 	// Number of chunks to read
 	/*int chunks_to_read = size_t_ceil( nbytes, (size_t)MAX_AIO_SIZE );*/
 	// offset
@@ -181,7 +181,7 @@ void double_buffering_read_XR( double_buffering *b, which_buffer wh_buff, size_t
 	// Which buffer
 	/*aiocb_list *buff = wh_buff == IO_BUFF ? b->io_l : b->comp_l;*/
 	// Still buff_size available?
-	size_t nbytes = (to - from + 1) * cf->n * cf->wXR * sizeof(double);
+	size_t nbytes = (size_t)(to - from + 1) * cf->n * cf->wXR * sizeof(double);
 	// Number of chunks to read
 	/*int chunks_to_read = size_t_ceil( nbytes, (size_t)MAX_AIO_SIZE );*/
 	// offset
@@ -203,7 +203,7 @@ void double_buffering_write_B(  double_buffering *b, which_buffer wh_buff, size_
 	// Which buffer
 	/*aiocb_list *buff = wh_buff == IO_BUFF ? b->io_l : b->comp_l;*/
 	// Still buff_size available?
-	size_t nbytes = (to_i - from_i + 1) * size_one_b *
+	size_t nbytes = (size_t)(to_i - from_i + 1) * size_one_b *
 	                (to_j - from_j + 1) * sizeof(double);
 	// Number of chunks to write
 	/*int chunks_to_write = size_t_ceil( nbytes, (size_t)MAX_AIO_SIZE );*/
@@ -225,7 +225,7 @@ void double_buffering_write_V(  double_buffering *b, which_buffer wh_buff, size_
 	// Which buffer
 	/*aiocb_list *buff = wh_buff == IO_BUFF ? b->io_l : b->comp_l;*/
 	// Still buff_size available?
-	size_t nbytes = ((to_i - from_i + 1) * cf->p * cf->p *
+	size_t nbytes = (size_t)((to_i - from_i + 1) * cf->p * cf->p *
 	                 (to_j - from_j + 1)) * sizeof(double);
 	// Number of chunks to write
 	/*int chunks_to_write = size_t_ceil( nbytes, (size_t)MAX_AIO_SIZE );*/
