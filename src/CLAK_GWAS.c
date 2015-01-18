@@ -43,6 +43,7 @@ int parse_input( int argc, char *argv[], char *var,
 void check_input_integrity( FGLS_config_t *cf, char *var,
 				         char *cov_base, char *phi_base, char *snp_base, char *pheno_base, char *out_base,
 						 int nths, int thres, int xtile, int ytile, int xb, int yb, int write_output );
+void print_banner( void );
 void print_info( FGLS_config_t *cf );
 void append_estimates( FGLS_config_t *cf );
 void write_output_info_file( FGLS_config_t *cf );
