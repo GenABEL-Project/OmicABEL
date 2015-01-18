@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2012, Diego Fabregat-Traver and Paolo Bientinesi.
+ * Copyright (c) 2010-2015, Diego Fabregat-Traver and Paolo Bientinesi.
  * All rights reserved.
  *
  * This file is part of OmicABEL.
@@ -28,6 +28,7 @@
 
 #include <sys/stat.h>
 
+#include "METADATA.h"
 #include "wrappers.h"
 #include "utils.h"
 #include "timing.h"
@@ -62,6 +63,8 @@ int main( int argc, char *argv[] )
 
     FGLS_config_t cf;
     struct timeval start, end;
+
+    print_banner();
 
 	status = parse_input( argc, argv, var, 
 			              cov_base, phi_base, snp_base, pheno_base, out_base,
@@ -486,6 +489,14 @@ void check_input_integrity( FGLS_config_t *cf, char *var,
 	cf->y_b = yb;
 	cf->x_tile = xtile;
 	cf->y_tile = ytile;
+}
+
+void print_banner( void )
+{
+    printf("\n* This is OmicABEL version %s.\n", OMICABEL_VERSION);
+    printf("* Copyright (C) 2010-2015 Diego Fabregat-Traver, Paolo Bientinesi.\n");
+    printf("* OmicABEL is distributed under the GNU GPL version 3 or later (see LICENSE).\n");
+    printf("* For a tutorial and more, see http://www.genabel.org/packages/OmicABEL.\n\n\n");
 }
 
 void print_info( FGLS_config_t *cf )

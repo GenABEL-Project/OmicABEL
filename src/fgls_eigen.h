@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2012, Diego Fabregat-Traver and Paolo Bientinesi.
+ * Copyright (c) 2010-2015, Diego Fabregat-Traver and Paolo Bientinesi.
  * All rights reserved.
  *
  * This file is part of OmicABEL.

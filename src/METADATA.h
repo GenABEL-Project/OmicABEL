@@ -1,0 +1,1 @@
+#define OMICABEL_VERSION "0.8.0"

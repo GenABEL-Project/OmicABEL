@@ -1,9 +1,11 @@
 include ./make.inc
 
+VERSION=0.8.0
+
 SRCDIR = ./src
 RESH_SRCDIR = ./src/reshuffle
 F2D_SRCDIR  = ./src/float2double
-CLAKGWAS  = ./bin/CLAK-GWAS
+CLAKGWAS  = ./bin/OmicABEL
 RESHUFFLE = ./bin/reshuffle
 F2D       = ./bin/float2double
 
@@ -41,7 +43,7 @@ $(F2D): $(F2D_OBJS)
 
 # Dirty, improve
 platform=Linux
-bindistDir=OmicABEL-$(platform)-bin
+bindistDir=OmicABEL-$(VERSION)-$(platform)-bin
 bindist: ./bin/ $(CLAKGWAS) $(RESHUFFLE) $(F2D)
 	rm -rf $(bindistDir)
 	mkdir $(bindistDir)
@@ -64,13 +66,9 @@ clean:
 	$(RM) $(F2D)
 
 
-src/CLAK_GWAS.o: src/CLAK_GWAS.c src/wrappers.h src/utils.h src/GWAS.h \
- src/databel.h src/timing.h src/REML.h src/fgls_chol.h src/fgls_eigen.h \
- src/double_buffering.h
-src/GWAS.o: src/GWAS.c src/utils.h src/GWAS.h src/databel.h src/wrappers.h
-src/REML.o: src/REML.c src/options.h src/blas.h src/lapack.h src/ooc_BLAS.h \
- src/wrappers.h src/utils.h src/GWAS.h src/databel.h src/statistics.h \
- src/optimization.h src/REML.h
+src/CLAK_GWAS.o: src/CLAK_GWAS.c src/METADATA.h src/wrappers.h src/utils.h \
+ src/GWAS.h src/databel.h src/timing.h src/REML.h src/fgls_chol.h \
+ src/fgls_eigen.h src/double_buffering.h
 src/databel.o: src/databel.c src/databel.h src/wrappers.h
 src/double_buffering.o: src/double_buffering.c src/GWAS.h src/databel.h \
  src/wrappers.h src/double_buffering.h
@@ -80,12 +78,15 @@ src/fgls_chol.o: src/fgls_chol.c src/blas.h src/lapack.h src/options.h \
 src/fgls_eigen.o: src/fgls_eigen.c src/blas.h src/lapack.h src/options.h \
  src/GWAS.h src/databel.h src/wrappers.h src/timing.h \
  src/double_buffering.h src/ooc_BLAS.h src/utils.h src/fgls_eigen.h
+src/GWAS.o: src/GWAS.c src/utils.h src/GWAS.h src/databel.h src/wrappers.h
 src/ooc_BLAS.o: src/ooc_BLAS.c src/blas.h src/lapack.h src/options.h \
  src/GWAS.h src/databel.h src/wrappers.h src/utils.h \
  src/double_buffering.h src/ooc_BLAS.h
 src/optimization.o: src/optimization.c src/optimization.h
+src/REML.o: src/REML.c src/options.h src/blas.h src/lapack.h src/ooc_BLAS.h \
+ src/wrappers.h src/utils.h src/GWAS.h src/databel.h src/statistics.h \
+ src/optimization.h src/REML.h
 src/statistics.o: src/statistics.c src/statistics.h
 src/timing.o: src/timing.c src/timing.h
-src/utils.o: src/utils.c \
- src/GWAS.h src/databel.h src/wrappers.h src/utils.h
+src/utils.o: src/utils.c src/GWAS.h src/databel.h src/wrappers.h src/utils.h
 src/wrappers.o: src/wrappers.c src/GWAS.h src/databel.h src/wrappers.h
