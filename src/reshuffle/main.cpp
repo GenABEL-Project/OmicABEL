@@ -49,7 +49,7 @@ int main(int argc, char* argv[]) {
 
 		cout<<"\nStart reshuffeling";
 		iout_file iout_F(Params);
-		cout << "\nFinish iout_file read\t" << double(clock()) / CLOCKS_PER_SEC <<" sec";
+		cout << "\nFinish iout_file read " << double(clock()) / CLOCKS_PER_SEC <<" sec";
 
 		if(Params.traits.use)
 			Params.traits.setbynames(*(iout_F.labels.trait_names));
@@ -59,7 +59,7 @@ int main(int argc, char* argv[]) {
 			Params.herit.setbynames(*(iout_F.labels.trait_names));
 		Reshuffle reshh(iout_F,Params);
 		reshh.run();
-		cout << "\nFinish reshuffling " << double(clock()) / CLOCKS_PER_SEC <<" sec";
+		cout << "\nFinish reshuffling " << double(clock()) / CLOCKS_PER_SEC <<" sec\n\n";
 	}
 	return (0);
 }

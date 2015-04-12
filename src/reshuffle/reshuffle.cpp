@@ -25,7 +25,7 @@ void Reshuffle::write_datadims(ofstream& txt_datadims){
 	txt_datadims << "Number of traits\t" << (*p_iout_file).header.t << endl;
 	txt_datadims << "Number of SNP\t" << (*p_iout_file).header.m << endl;
 	txt_datadims << "Number of covariates\t" << ((*p_iout_file).header.p - 2);
-	cout<<"\nEnd write data dimension\t"<< double(clock()) / CLOCKS_PER_SEC <<" sec";
+	cout<<"\nEnd write data dimension "<< double(clock()) / CLOCKS_PER_SEC <<" sec";
 }
 
 void Reshuffle::write_snpnames(ofstream& txt_snpnames){
@@ -36,8 +36,8 @@ void Reshuffle::write_snpnames(ofstream& txt_snpnames){
 		cout<<"\nWriting all SNP's names";
 	}
 	for(set<int>::iterator it= (*p_Parameters).snpnames.numbersset.begin();it!=(*p_Parameters).snpnames.numbersset.end();++it)
-		txt_snpnames << "\nSNP #"<<(*it+1)<<"\t"<<(*(*p_iout_file).labels.snp_names)[*it];
-	cout<<"\nEnd write SNP's names\t" << double(clock()) / CLOCKS_PER_SEC <<" sec";
+		txt_snpnames << "\nSNP#"<<(*it+1)<<"\t"<<(*(*p_iout_file).labels.snp_names)[*it];
+	cout<<"\nEnd write SNP's names " << double(clock()) / CLOCKS_PER_SEC <<" sec";
 }
 
 void Reshuffle::write_traitnames(ofstream& txt_traitnames){
@@ -48,13 +48,13 @@ void Reshuffle::write_traitnames(ofstream& txt_traitnames){
 		cout<<"\nWriting all trait's names";
 	}
 	for(std::set<int>::iterator it= (*p_Parameters).traitnames.numbersset.begin();it!=p_Parameters->traitnames.numbersset.end();++it)
-		txt_traitnames<<"TRAIT #"<<(*it+1)<<"\t"<<(*(*p_iout_file).labels.trait_names)[*it];
-	cout<<"\nEnd write trait's names\t" << double(clock()) / CLOCKS_PER_SEC <<" sec" << endl;
+		txt_traitnames<<"\nTRAIT#"<<(*it+1)<<"\t"<<(*(*p_iout_file).labels.trait_names)[*it];
+	cout<<"\nEnd write trait's names " << double(clock()) / CLOCKS_PER_SEC <<" sec" << endl;
 }
 
 void Reshuffle::write_data(ifstream& out_file,ofstream& data){
 	out_file.seekg(0, ios_base::beg);
-	cout << "\nStart write data\t" << double(clock()) / CLOCKS_PER_SEC <<" sec";
+	cout << "\nStart write data " << double(clock()) / CLOCKS_PER_SEC <<" sec";
 	data.precision(PRECISION_DOUBLE);
 	data<<"SNP\t";
 	data<<	"Trait\t";
@@ -98,8 +98,13 @@ void Reshuffle::write_data_chi(ifstream& out_file,ofstream& txt_chi){
 	out_file.seekg(0, ios_base::beg);
 	double chi = 0;
 	set<int>::iterator chi_val = (*p_Parameters).chi.numbersset.begin();
-	double CheckChi = *chi_val+1;
-	cout << "\nStart write chi data=" << double(clock()) / CLOCKS_PER_SEC <<" sec";
+	double CheckChi = 0;
+	if((*p_Parameters).chi.numbersset.size()==0){
+		CheckChi = 0;
+	}else{
+		CheckChi = *chi_val+1;
+	}
+	cout << "\nStart write chi data " << double(clock()) / CLOCKS_PER_SEC <<" sec";
 	txt_chi.precision(PRECISION_DOUBLE);
 	txt_chi << "SNP\t";
 	txt_chi << "Trait\t";
@@ -139,22 +144,27 @@ void Reshuffle::write_data_chi(ifstream& out_file,ofstream& txt_chi){
 		ostr.clear();
 	}
 	delete buf;
-	cout << "\nFinish write chi data\t" << double(clock()) / CLOCKS_PER_SEC <<" sec";
+	cout << "\nFinish write chi data " << double(clock()) / CLOCKS_PER_SEC <<" sec";
 }
 
 void Reshuffle::write_slim_data(ifstream& out_file, ofstream& txt_slim){
-	cout << "\nStart write slim data=" << double(clock()) / CLOCKS_PER_SEC <<" sec";
+	cout << "\nStart write slim data " << double(clock()) / CLOCKS_PER_SEC <<" sec";
 	out_file.seekg(0, ios_base::beg);
 	set<int> goodtraits;
 	set<int> goodsnps;
 	double chi = 0;
 	if((*p_Parameters).chi.def_value||(!(*p_Parameters).chi.use)){
 		cout << "\nERROR: " << "Chi value doesn't exist";
-		cout << "\nPlease, set Chi value to get slim data";
+		cout << "\nPlease, set Chi value to get slim data\n";
 		exit(1);
 	}
 	set<int>::iterator chi_val = (*p_Parameters).chi.numbersset.begin();
-	double CheckChi = *chi_val+1;
+	double CheckChi = 0;
+	if((*p_Parameters).chi.numbersset.size()==0){
+		CheckChi = 0;
+	}else{
+		CheckChi = *chi_val+1;
+	}
 	double* buf = new double[per_trait_per_snp];
 	for (set<int>::iterator trait= (*p_Parameters).traits.numbersset.begin();trait!=(*p_Parameters).traits.numbersset.end();trait++) {
 		long long oldPos=0,pos = 0;
@@ -211,7 +221,7 @@ void Reshuffle::write_slim_data(ifstream& out_file, ofstream& txt_slim){
 		ostr.clear();
 	}
 	delete buf;
-	cout <<"\nEnd write slim data\t" << double(clock()) / CLOCKS_PER_SEC <<" sec";
+	cout <<"\nEnd write slim data " << double(clock()) / CLOCKS_PER_SEC <<" sec";
 }
 
 int Reshuffle::est_shift(int counter){

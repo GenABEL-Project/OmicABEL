@@ -136,7 +136,7 @@ Parameters::Parameters(int argc,char* argv[]) {
 			{"traits",optional_argument,NULL,'t'},
 			{"snps",optional_argument,NULL,'s'},
 			{"herit",optional_argument,NULL,'e'},
-			{"chi",required_argument,NULL,'c'},
+			{"chi",optional_argument,NULL,'c'},
 			{"dataslim",no_argument,NULL,'l'},
 			{"outfile",required_argument,NULL,'o'},
 			{NULL,0,NULL,0}
@@ -179,10 +179,12 @@ Parameters::Parameters(int argc,char* argv[]) {
 			}
 			case 'c':{
 				chi = Parameter(optarg,"chi");
-				if (chi.numbersset.size()==0){
-					cout<<"\nChi value is not a number. Please, set correct Chi value";
+				//cout << "\n\nchi.numbersset = " << chi<<"\n\n";
+				/*if (chi.numbersset.size()==0){
+					cout<<"\nChi value is not a number. Please, set correct Chi value\n";
 					exit(1);
-				}
+				}*/
+				//cout <<"\nChi is yopta " << chi;
 
 				break;
 			}
@@ -193,6 +195,7 @@ Parameters::Parameters(int argc,char* argv[]) {
 			case 'o':{
 				default_outfile = false;
 				outfile=optarg;
+				//cout << "\n\nOutfile name os yopta = " << outfile<<"\n\n";
 				break;
 			}
 			}
