@@ -7,4 +7,4 @@ all:
 	
 clean:
 
-	rm -rf *.o reshuffle
+	rm -f iout_file.o reshuffle_obj.o Parameters.o main.o reshuffle

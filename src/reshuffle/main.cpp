@@ -12,8 +12,9 @@
 using namespace std;
 
 void print_help(){
+	cout << "\n Reshuffle version 0.34 Apr 12 2015";
 	cout <<endl;
-	cout << "\n	Available commands";
+	cout << "\n Available commands";
 	cout << "\n\n --help | to get this help message";
 	cout << "\n\n --datadims | to get data's dimension";
 	cout << "\n\n --snpnames=<indexes> | to get names of SNP by indexes";
